@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lydia工作台">
+<title>Lydia 工作台</title>
+<style>
+:root {
+  --sun: #FF9500; --sun-l: #FFB84D; --sun-grad: linear-gradient(135deg,#FF9500,#FF6B35);
+  --red: #C41230; --red-l: #E8455A;
+  --dark: #111827; --dark2: #1F2937; --dark3: #374151;
+  --bg: #F3F4F6; --card: #FFF;
+  --text: #111827; --text2: #6B7280; --text3: #9CA3AF;
+  --border: #E5E7EB;
+  --shadow: 0 1px 3px rgba(0,0,0,.06);
+  --shadow2: 0 4px 16px rgba(0,0,0,.08);
+  --radius: 10px; --radius2: 14px;
+  --sidebar-w: 220px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  /* energy colors */
+  --e-1: #FF6B6B; --e-2: #FFD93D; --e-3: #6BCB77; --e-4: #4D96FF;
+  --e-5: #FF8C00; --e-6: #9B59B6;
+  /* direction colors */
+  --c-rescue: #FF6B35; --c-overseas: #2196F3;
+  --c-safety: #4CAF50; --c-future: #9C27B0; --c-tech: #00BCD4;
+  /* platform colors */
+  --p-douyin: #111; --p-bili: #FB7299; --p-xhs: #FF2442;
+  --p-weibo: #E6162D; --p-kuaishou: #FF4906;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--text); line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+a{color:var(--red);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{
+  width:var(--sidebar-w); background:var(--dark);
+  color:#FFF; display:flex; flex-direction:column;
+  position:fixed; top:0; left:0; bottom:0; z-index:50;
+  transition:transform .3s ease; padding:20px 0;
+}
+.sidebar-logo{
+  padding:0 20px 20px; border-bottom:1px solid var(--dark3);
+  display:flex; align-items:center; gap:10px;
+}
+.sidebar-logo .icon{
+  width:42px;height:42px;border-radius:50%;
+  overflow:hidden;flex-shrink:0;
+  box-shadow:0 2px 10px rgba(255,149,0,.35);
+  border:2px solid rgba(255,255,255,.2);
+}
+.sidebar-logo .icon img{width:100%;height:100%;object-fit:cover}
+.sidebar-logo .txt{font-size:17px;font-weight:700}
+.sidebar-logo .sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 20px; cursor:pointer; transition:all .15s;
+  color:rgba(255,255,255,.55); font-size:14px; font-weight:500;
+  border-left:3px solid transparent; user-select:none;
+}
+.nav-item:hover{color:#FFF;background:rgba(255,255,255,.06)}
+.nav-item.active{color:#FFF;background:rgba(255,149,0,.15);border-left-color:var(--sun)}
+.nav-item .ico{font-size:19px;width:24px;text-align:center}
+.nav-item .badge{
+  margin-left:auto; font-size:10px; font-weight:700;
+  background:var(--sun); color:#FFF; padding:2px 7px;
+  border-radius:10px; min-width:20px; text-align:center;
+}
+
+/* Main */
+.main{
+  flex:1; margin-left:var(--sidebar-w); padding:20px 24px;
+  padding-bottom:calc(24px + var(--safe-b));
+}
+.page{display:none;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Page header */
+.page-header{margin-bottom:20px}
+.page-title{font-size:24px;font-weight:800;color:var(--text)}
+.page-sub{font-size:13px;color:var(--text2);margin-top:4px}
+
+/* Cards */
+.card{
+  background:var(--card); border-radius:var(--radius2);
+  padding:20px; margin-bottom:16px;
+  box-shadow:var(--shadow); border:1px solid var(--border);
+}
+.card-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px; flex-wrap:wrap; gap:8px;
+}
+.card-ttl{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.card-badge{
+  font-size:10px;font-weight:700;padding:3px 10px;
+  border-radius:12px;background:var(--red);color:#FFF;
+}
+.card-badge.green{background:#4CAF50}
+.card-badge.orange{background:var(--sun)}
+
+/* Sub-nav tabs */
+.sub-nav{display:flex;gap:4px;margin-bottom:20px;background:var(--card);border-radius:var(--radius);padding:4px;box-shadow:var(--shadow);}
+.sub-tab{flex:1;padding:10px 16px;border:none;background:transparent;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s}
+.sub-tab:hover{color:var(--text);background:var(--bg)}
+.sub-tab.active{background:var(--sun);color:#FFF;font-weight:600}
+
+/* News items */
+.news-list{list-style:none}
+.news-item{padding:14px 0;border-bottom:1px solid var(--border)}
+.news-item:last-child{border-bottom:none}
+.news-src{font-size:11px;font-weight:600;color:var(--text3);margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.news-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px}
+.news-title a{color:var(--text)}
+.news-title a:hover{color:var(--sun)}
+.news-desc{font-size:13px;color:var(--text2);line-height:1.5}
+.news-meta{font-size:11px;color:var(--text3);margin-top:4px}
+.sent-badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;
+  font-size:10px;font-weight:600;
+}
+.sent-badge.neg{background:#FFE5E5;color:#C41230}
+.sent-badge.warn{background:#FFF3E0;color:#E65100}
+.sent-badge.neu{background:#E8F5E9;color:#2E7D32}
+.sent-badge.pos{background:#E3F2FD;color:#1565C0}
+
+/* Platform mini badges */
+.plat-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;color:#FFF;
+}
+.plat-badge.douyin{background:#111}
+.plat-badge.bili{background:var(--p-bili)}
+.plat-badge.xhs{background:var(--p-xhs)}
+.plat-badge.weibo{background:var(--p-weibo)}
+.plat-badge.kuaishou{background:var(--p-kuaishou)}
+.plat-badge.toutiao{background:#E13B3B}
+.plat-badge.video{background:#7B2FBE}
+
+/* Video link icon */
+.vid-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--sun);cursor:pointer;margin-left:4px}
+.vid-link:hover{text-decoration:underline}
+
+/* Direction tags */
+.dir-tag{
+  display:inline-block;padding:3px 10px;border-radius:12px;
+  font-size:10px;font-weight:600;color:#FFF;margin-left:4px;
+}
+.dir-tag.rescue{background:var(--c-rescue)}
+.dir-tag.overseas{background:var(--c-overseas)}
+.dir-tag.safety{background:var(--c-safety)}
+.dir-tag.future{background:var(--c-future)}
+.dir-tag.tech{background:var(--c-tech)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat-card{
+  background:var(--card);border-radius:var(--radius);
+  padding:16px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);
+}
+.stat-v{font-size:28px;font-weight:800;color:var(--sun)}
+.stat-l{font-size:11px;color:var(--text2);margin-top:3px}
+
+/* ══════ ENERGY SECTION ══════ */
+.energy-hero{
+  background:linear-gradient(135deg,#FFF9F0,#FFF3E0,#FFECD2);
+  border-radius:var(--radius2);padding:28px;margin-bottom:16px;
+  border:2px solid rgba(255,149,0,.15);position:relative;overflow:hidden;
+}
+.energy-hero::before{
+  content:'';position:absolute;top:-30px;right:-30px;
+  width:120px;height:120px;background:var(--sun-grad);
+  opacity:.08;border-radius:50%;
+}
+.energy-hero .energy-icon{font-size:48px;margin-bottom:12px;position:relative}
+.energy-hero .energy-quote{
+  font-size:20px;font-weight:800;color:#B25D00;line-height:1.5;
+  position:relative;margin-bottom:8px;
+}
+.energy-hero .energy-author{font-size:13px;color:#CC7A00;position:relative}
+.energy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.energy-card{
+  background:var(--card);border-radius:var(--radius);padding:18px;
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  text-align:center;transition:all .2s;
+}
+.energy-card:hover{transform:translateY(-2px);box-shadow:var(--shadow2)}
+.energy-card .e-icon{font-size:32px;margin-bottom:8px}
+.energy-card .e-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.energy-card .e-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.energy-actions{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+}
+.energy-act{
+  background:var(--card);border-radius:var(--radius);padding:16px 12px;
+  text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);
+  cursor:pointer;transition:all .15s;
+}
+.energy-act:hover{background:#FFF9F0;border-color:var(--sun)}
+.energy-act .ea-icon{font-size:28px;margin-bottom:6px}
+.energy-act .ea-title{font-size:12px;font-weight:600;color:var(--text)}
+.energy-act .ea-sub{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* Affirmation ticker */
+.affirm-ticker{
+  background:linear-gradient(135deg,#1A1A2E,#16213E,#0F3460);
+  border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;
+  overflow:hidden;position:relative;
+}
+.affirm-ticker .ticker-title{
+  font-size:11px;font-weight:700;color:rgba(255,255,255,.4);
+  text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;
+}
+.affirm-scroll{display:flex;gap:40px;animation:scroll 20s linear infinite;white-space:nowrap}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.affirm-item{font-size:15px;color:#FFD93D;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.affirm-item .star{font-size:18px}
+
+/* Flashcard */
+.flash-wrap{perspective:1000px}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.flash-card{
+  height:160px;cursor:pointer;position:relative;
+  transform-style:preserve-3d;transition:transform .5s ease;
+}
+.flash-card.flipped{transform:rotateY(180deg)}
+.flash-face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:var(--radius);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:16px;
+  font-weight:600;border:2px solid var(--border);
+}
+.flash-front{background:var(--card);color:var(--red);font-size:24px;text-align:center}
+.flash-back{
+  background:var(--dark);color:#FFF;transform:rotateY(180deg);
+  font-size:14px;text-align:center;line-height:1.4;
+}
+.flash-back .jyut{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px;font-style:italic}
+.flash-back .meaning{font-size:16px;margin-top:8px;font-weight:700}
+
+/* Dialogue */
+.dialogue{padding:16px;background:var(--bg);border-radius:var(--radius)}
+.dlg-line{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
+.dlg-line.me{flex-direction:row-reverse}
+.dlg-bubble{
+  max-width:75%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.5;
+}
+.dlg-line:not(.me) .dlg-bubble{background:var(--card);border:1px solid var(--border)}
+.dlg-line.me .dlg-bubble{background:var(--red);color:#FFF}
+.dlg-jyut{font-size:11px;color:var(--text3);margin-top:2px;font-style:italic}
+.dlg-line.me .dlg-jyut{color:rgba(255,255,255,.6)}
+.dlg-avatar{
+  width:32px;height:32px;border-radius:50%;background:var(--dark3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;color:#FFF;
+}
+.dlg-line.me .dlg-avatar{background:var(--red)}
+
+/* Learn tip */
+.learn-tip{
+  background:linear-gradient(135deg,#FFF5F5,#FFE8E8);
+  border-radius:var(--radius);padding:14px 18px;
+  border-left:4px solid var(--red);margin-bottom:16px;
+}
+.learn-tip p{font-size:13px;color:#8B1A1A}
+.learn-tip .tip-ttl{font-weight:700;margin-bottom:3px;font-size:14px}
+
+/* English vocab */
+.vocab-row{display:flex;flex-wrap:wrap;gap:10px}
+.vocab-chip{
+  background:var(--bg);border-radius:8px;padding:12px 16px;
+  flex:1;min-width:200px;transition:all .15s;border-left:3px solid transparent;
+}
+.vocab-chip:hover{border-left-color:var(--sun)}
+.vocab-chip .word{font-size:18px;font-weight:700;color:var(--red)}
+.vocab-chip .phon{font-size:11px;color:var(--text3);margin:2px 0 4px;font-style:italic}
+.vocab-chip .def{font-size:12px;color:var(--text2)}
+
+/* BBC block */
+.bbc-block{background:linear-gradient(135deg,#0D1B2A,#1B2838);border-radius:var(--radius2);padding:22px;color:#FFF;margin-bottom:16px}
+.bbc-block .bbc-ttl{font-size:18px;font-weight:800;margin-bottom:4px}
+.bbc-block .bbc-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:14px}
+.bbc-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:14px;line-height:1.4}
+.bbc-item:last-child{border-bottom:none}
+.bbc-item a{color:#FFF}
+.bbc-item a:hover{color:#FFD93D;text-decoration:none}
+.bbc-item .bbc-cat{font-size:10px;color:var(--sun);font-weight:700;text-transform:uppercase}
+
+/* Section divider */
+.section-label{
+  font-size:11px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:1px;
+  padding:8px 0;border-bottom:2px solid var(--bg);margin-bottom:12px;
+}
+
+/* Energy section label */
+.energy-label{
+  font-size:11px;font-weight:700;color:var(--sun);
+  text-transform:uppercase;letter-spacing:1px;
+  padding:8px 0;border-bottom:2px solid rgba(255,149,0,.15);margin-bottom:12px;
+}
+
+/* Mobile bottom nav */
+.mob-nav{
+  display:none; position:fixed; bottom:0; left:0; right:0;
+  background:var(--card); border-top:1px solid var(--border);
+  z-index:60; padding:6px 0 var(--safe-b);
+  box-shadow:0 -2px 10px rgba(0,0,0,.05);
+}
+.mob-nav-inner{display:flex}
+.mob-nav-item{
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  padding:6px 4px; cursor:pointer; color:var(--text3);
+  font-size:10px; font-weight:500; transition:color .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-nav-item.active{color:var(--sun)}
+.mob-nav-item .mob-ico{font-size:20px;margin-bottom:2px}
+
+/* Hamburger */
+.hamburger{
+  display:none; position:fixed; top:12px; left:12px; z-index:70;
+  width:36px;height:36px;background:var(--card);border-radius:8px;
+  border:1px solid var(--border);font-size:18px;cursor:pointer;
+  align-items:center;justify-content:center;box-shadow:var(--shadow);
+}
+
+/* Overlay */
+.overlay{
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.4);
+  z-index:45;
+}
+.overlay.show{display:block}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:12px 14px;padding-top:52px;padding-bottom:calc(72px + var(--safe-b))}
+  .hamburger{display:flex}
+  .mob-nav{display:block}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .flash-grid{grid-template-columns:repeat(2,1fr)}
+  .energy-grid{grid-template-columns:1fr}
+  .energy-actions{grid-template-columns:repeat(2,1fr)}
+  .page-title{font-size:20px}
+  .card{padding:14px}
+  .sub-nav{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sub-tab{white-space:nowrap;flex:none;padding:8px 12px}
+  .energy-hero .energy-quote{font-size:17px}
+  .energy-hero{padding:20px}
+}
+
+.speak-btn{
+  background:none;border:none;font-size:15px;cursor:pointer;
+  opacity:.55;transition:opacity .15s;padding:2px 4px;vertical-align:middle;
+}
+.speak-btn:hover{opacity:1}
+.flash-front .speak-btn{position:absolute;bottom:8px;right:8px;font-size:16px}
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- Hamburger -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="icon"><img src="avatar.jpg" alt="Lydia"></div>
+    <div><div class="txt">Lydia 工作台</div><div class="sub">Lydia AI智能助手</div></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" data-page="energy" onclick="navTo('energy')">
+      <span class="ico">⚡</span> 每日正能量
+    </div>
+    <div class="nav-item" data-page="work" onclick="navTo('work')">
+      <span class="ico">📊</span> 比亚迪工作
+      <span class="badge">24h</span>
+    </div>
+    <div class="nav-item" data-page="finance" onclick="navTo('finance')">
+      <span class="ico">💹</span> 每日财经投资
+    </div>
+    <div class="nav-item" data-page="ai" onclick="navTo('ai')">
+      <span class="ico">🤖</span> 每日AI科技资讯
+    </div>
+    <div class="nav-item" data-page="canto" onclick="navTo('canto')">
+      <span class="ico">🗣️</span> 每日粤语学习
+    </div>
+    <div class="nav-item" data-page="english" onclick="navTo('english')">
+      <span class="ico">🌍</span> 每日英语学习
+    </div>
+    <div class="nav-item" data-page="reading" onclick="navTo('reading')">
+      <span class="ico">📚</span> 每日阅读打卡
+    </div>
+  </nav>
+  <div id="sidebarTime" style="padding:12px 20px;font-size:11px;color:rgba(255,255,255,.35)"></div>
+</aside>
+
+<!-- Main -->
+<main class="main" id="mainContent">
+
+<!-- ═══════════════ PAGE: 比亚迪工作 ═══════════════ -->
+<div class="page" id="page-work">
+  <div class="page-header">
+    <div class="page-title">📊 比亚迪工作</div>
+    <div class="page-sub">过去24h全网舆情监控 & 情绪价值选题 & 每日向日葵打卡 · 以视频素材为主</div>
+  </div>
+
+  <!-- Sub-nav -->
+  <div class="sub-nav">
+    <button class="sub-tab active" onclick="switchWorkTab('sentiment',this)">🔴 每日舆情</button>
+    <button class="sub-tab" onclick="switchWorkTab('emotion',this)">💡 每日选题</button>
+    <button class="sub-tab" onclick="switchWorkTab('industry',this)">🚗 行业动态</button>
+    <button class="sub-tab" onclick="switchWorkTab('marketing',this)">📣 营销常识</button>
+    <button class="sub-tab" onclick="switchWorkTab('jobs',this)">🌐 AI出海机会</button>
+    <button class="sub-tab" onclick="switchWorkTab('sunflower',this)">🌻 向日葵打卡</button>
+  </div>
+
+  <!-- ═══ 舆情子板块 ═══ -->
+  <div class="work-sub active" id="work-sentiment">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">🔴 负面舆情 & 需关注信息</div>
+        <span class="card-badge">仅收录 7/26 24h内</span>
+      </div>
+      <ul class="news-list">
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="plat-badge weibo">微博</span>
+            <span class="sent-badge neg">负面·高危</span>
+            <a class="vid-link" href="https://www.163.com/dy/article/L2OTR77105566ZAS.html" target="_blank">▶ 查看报道</a>
+          </div>
+          <div class="news-title">
+            <a href="https://www.163.com/dy/article/L2OTR77105566ZAS.html" target="_blank">匈牙利新政府翻脸严查比亚迪百亿项目 — 为拿164亿欧盟资金清算前政府中资合作</a>
+          </div>
+          <div class="news-desc">匈牙利新政府7月26日宣布全面调查比亚迪塞格德工厂项目，前外长西雅尔多辞职转投比亚迪仅5天。工厂投产已从2025年底推迟至2026年Q4，面临严重政策不确定性。</div>
+          <div class="news-meta">2026-07-26 · 网易/观察者网 · 阅读量100万+</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="sent-badge warn">需关注</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260725A043MI00" target="_blank">▶ 查看报道</a>
+          </div>
+          <div class="news-title">
+            <a href="https://view.inews.qq.com/a/20260725A043MI00" target="_blank">比亚迪土耳其销量暴跌98.8% — 6月仅售83辆，在中国品牌中明显掉队</a>
+          </div>
+          <div class="news-desc">7月25日晚间数据：6月土耳其车市同比下滑11.4%，比亚迪当月仅售83辆，同比暴跌98.8%，与多数海外市场的高增长势头形成强烈反差。需关注是否为关税政策、渠道调整或竞争加剧所致，避免被放大解读为"海外遇挫"的叙事素材。</div>
+          <div class="news-meta">2026-07-25晚 · 芝能汽车/腾讯新闻</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="sent-badge neu">中性·关注</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260725A06HYR00" target="_blank">▶ 查看报道</a>
+          </div>
+          <div class="news-title">
+            <a href="https://view.inews.qq.com/a/20260725A06HYR00" target="_blank">比亚迪日本微型车RACCO将于7月28日发售 — 定价250-300万日元</a>
+          </div>
+          <div class="news-desc">7月25日消息：比亚迪纯电微型车RACCO将于7月28日在日本发售，续航320公里，为日本市场首款破300公里的轻型纯电车，获日本微型车协会会长公开欢迎。发售后的日媒评价与首批销量值得持续跟踪——日本是全球最排外的汽车市场，口碑走向敏感。</div>
+          <div class="news-meta">2026-07-25晚 · 驱动之家/腾讯新闻</div>
+        </li>
+      </ul>
+    </div>
+    <div class="learn-tip">
+      <div class="tip-ttl">⚠️ PR 应对建议（按优先级排序）</div>
+      <p><strong>① 匈牙利项目（P0）：</strong>7/26刚发酵，尽快发布官方声明强调项目合规、创造本地就业、符合欧盟标准，避免被政治化炒作。<br>
+      <strong>② 土耳其数据（P1）：</strong>提前准备口径——单一市场月度波动属正常，如有渠道/产品节奏调整可主动说明，用葡萄牙+41.9%、韩国第九等同期正面数据对冲。<br>
+      <strong>③ 日本RACCO（关注）：</strong>7/28发售是正向节点，可预备"日本微型车协会会长欢迎"的传播素材，同时监控日媒评测口碑。</p>
+    </div>
+  </div>
+
+  <!-- ═══ 情绪选题子板块 ═══ -->
+  <div class="work-sub" id="work-emotion" style="display:none">
+
+    <!-- 1. 品牌大事件向 -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">🎪 品牌大事件向</div>
+        <span class="card-badge orange">今日最热</span>
+      </div>
+      <ul class="news-list">
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge weibo">微博</span>
+            <span class="plat-badge douyin">抖音</span>
+            <span class="dir-tag overseas">品牌大事件</span>
+            <a class="vid-link" href="https://weibo.com/ttarticle/p/show?id=2309405325075947061316" target="_blank">▶ 看视频</a>
+          </div>
+          <div class="news-title">
+            <a href="https://weibo.com/ttarticle/p/show?id=2309405325075947061316" target="_blank">【视频】可可托海旷野盛典：大唐EV第1万辆交付+千里画廊闪充大道揭幕+旗舰大汉彩蛋亮相</a>
+          </div>
+          <div class="news-desc">7月26日发布：新疆可可托海"以天为幕、以地为席"，第一万辆大唐EV车主正是足球小将创始人董路——"在足球小将最困难时期幸得比亚迪雪中送炭"。阿勒泰首座闪充站落成，G331北疆自驾补能最后一块拼图补齐。活动最大彩蛋：D级旗舰轿车"大汉"亮相，车长超5.2米、续航1008km，8月成都车展首发。</div>
+          <div class="news-meta">2026-07-26 · 微博长文/抖音 · 现象级品牌事件</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="plat-badge douyin">抖音</span>
+            <span class="dir-tag tech">中国科技向</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260725A0BBH100" target="_blank">▶ 看视频</a>
+          </div>
+          <div class="news-title">
+            <a href="https://view.inews.qq.com/a/20260725A0BBH100" target="_blank">【视频】比亚迪大汉官图发布：续航1008公里，D级旗舰轿车8月成都车展首秀</a>
+          </div>
+          <div class="news-desc">7月25日晚发布：新车尺寸5256/1999/1510mm、轴距3130mm，纯电CLTC续航最高1008公里。"大汉"命名深挖丝绸之路与新疆文化渊源——"代表中国人永远敢开路、往前冲、能抵达的精神"。王朝13年累计用户突破960万，全球新能源保有量第一。</div>
+          <div class="news-meta">2026-07-25晚~26 · 太平洋汽车/腾讯 · 热度持续攀升</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="plat-badge douyin">抖音</span>
+            <span class="dir-tag overseas">品牌活动向</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260726A06J6D00" target="_blank">▶ 看视频</a>
+          </div>
+          <div class="news-title">
+            <a href="https://view.inews.qq.com/a/20260726A06J6D00" target="_blank">【视频】方程豹唯一指定伙伴护航萨克斯教授"新丝绸之路"，豹友聚新疆共赴山海</a>
+          </div>
+          <div class="news-desc">7月26日报道：方程豹作为唯一指定合作伙伴，护航著名经济学家萨克斯教授"新丝绸之路"活动，豹友齐聚新疆。国际顶级学者+中国品牌+丝路叙事，是"文化出海"的高质感素材。</div>
+          <div class="news-meta">2026-07-26 · 差评XPIN/腾讯 · 精英圈层传播</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 2. 政要·公务选择向 -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">👑 政要·公务选择向</div>
+        <span class="card-badge green">国际影响力</span>
+      </div>
+      <ul class="news-list">
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="plat-badge kuaishou">快手</span>
+            <span class="dir-tag tech">政要选择</span>
+            <a class="vid-link" href="https://so.html5.qq.com/page/real/search_news?docid=70000021_9686a662eda37352" target="_blank">▶ 看视频</a>
+          </div>
+          <div class="news-title">
+            <a href="https://so.html5.qq.com/page/real/search_news?docid=70000021_9686a662eda37352" target="_blank">【视频】公务用车电动化大势已定：佛得角政府公务车全部换成比亚迪</a>
+          </div>
+          <div class="news-desc">7月26日报道：世界杯黑马佛得角官方宣布政府公务车已全部换成比亚迪。巴基斯坦大批量采购比亚迪警车，墨西哥、匈牙利、奥地利纳入警务/外事车队。国内2026上半年新能源公务车采购市占率超22%稳居第一，连续四年全球新能源销量冠军。</div>
+          <div class="news-meta">2026-07-26 · 腾讯新闻 · 公务市场背书</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 3. 海外正能量向 -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">🌏 海外正能量向</div>
+        <span class="card-badge green">多点开花</span>
+      </div>
+      <ul class="news-list">
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge weibo">微博</span>
+            <span class="plat-badge douyin">抖音</span>
+            <span class="dir-tag overseas">海外正能量向</span>
+            <a class="vid-link" href="https://weibo.com/7743671077/5324872030094751" target="_blank">▶ 看视频</a>
+          </div>
+          <div class="news-title">
+            <a href="https://weibo.com/7743671077/5324872030094751" target="_blank">【视频】比亚迪杀进韩国市场上半年第九：上升11个名次，电动车细分反超雷诺居第四</a>
+          </div>
+          <div class="news-desc">7月26日报道：韩系垄断本土几十年，比亚迪交出亮眼成绩单——2026上半年韩国榜单第九，同比上升11个名次；电动车细分市场反超雷诺稳居第四，持续挤压本土车企份额。在现代起亚大本营突围，含金量极高。</div>
+          <div class="news-meta">2026-07-26 · 微博 · #新能源大牛说#热议中</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="dir-tag overseas">海外正能量向</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260726A0547200" target="_blank">▶ 看报道</a>
+          </div>
+          <div class="news-title">
+            <a href="https://view.inews.qq.com/a/20260726A0547200" target="_blank">比亚迪葡萄牙6月销量涨41.9%：注册793辆，上半年连续双位数增长</a>
+          </div>
+          <div class="news-desc">7月26日报道：6月葡萄牙车市中国品牌中比亚迪注册793辆排第14，同比涨41.9%，上半年该市场连续双位数增长。欧洲市场稳步渗透的又一证据。</div>
+          <div class="news-meta">2026-07-26 · 芝能汽车/腾讯新闻</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="dir-tag overseas">海外正能量向</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260726A0553N00" target="_blank">▶ 看报道</a>
+          </div>
+          <div class="news-title">
+            <a href="https://view.inews.qq.com/a/20260726A0553N00" target="_blank">比亚迪马来西亚稳居前八：6月马来车市增25.4%，中国品牌电动化切入</a>
+          </div>
+          <div class="news-desc">7月26日报道：马来西亚6月汽车销量增25.4%，比亚迪稳居前八，奇瑞系破千。东南亚作为中国新能源出海主战场，比亚迪持续领跑。</div>
+          <div class="news-meta">2026-07-26 · 亿欧网/腾讯新闻</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 4. 销量实力向 -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">📈 销量实力向</div>
+      </div>
+      <ul class="news-list">
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="plat-badge xhs">小红书</span>
+            <span class="dir-tag tech">销量实力</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260726A04D3Q00" target="_blank">▶ 看报道</a>
+          </div>
+          <div class="news-title">
+            <a href="https://view.inews.qq.com/a/20260726A04D3Q00" target="_blank">元UP上半年销量超8.2万辆居纯电小型SUV榜首：亲民价+低用车成本冲击燃油小车</a>
+          </div>
+          <div class="news-desc">7月26日报道：1-6月纯电小型SUV比亚迪元UP零售82670辆居榜首。"年轻人的第一台纯电SUV"叙事亲民接地气，小红书可作"人生第一辆车"选题方向。</div>
+          <div class="news-meta">2026-07-26 · 鬼斗车/腾讯新闻</div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ═══ 行业动态子板块 ═══ -->
+  <div class="work-sub" id="work-industry" style="display:none">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">🚗 每日新能源汽车行业动态</div>
+        <span class="card-badge">仅收录 7/26-27 24h内</span>
+      </div>
+      <ul class="news-list">
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="sent-badge warn">行业监管</span>
+            <a class="vid-link" href="http://view.inews.qq.com/a/20260726A03RCX00" target="_blank">▶ 查看</a>
+          </div>
+          <div class="news-title"><a href="http://view.inews.qq.com/a/20260726A03RCX00" target="_blank">工信部将突击检查多家车企：聚焦质量、销量造假、虚假宣传三大痛点</a></div>
+          <div class="news-desc">7月26日消息：工信部等相关部门将对国内多家车企开展突击检查，标志新能源汽车从数量扩张迈向质量监管时代。检查涉及销量数据造假、虚假宣传及问题车强制召回。<strong>PR视角：行业性合规风暴前兆，比亚迪需提前自查宣传口径与销量数据披露。</strong></div>
+          <div class="news-meta">2026-07-26 · 车卖家/腾讯新闻</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="sent-badge neu">竞品动态</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260725A0C3BB00" target="_blank">▶ 查看</a>
+          </div>
+          <div class="news-title"><a href="https://view.inews.qq.com/a/20260725A0C3BB00" target="_blank">小米汽车或进军换电赛道：关联公司入股换电设施企业</a></div>
+          <div class="news-desc">7月25日消息：小米关联公司入股新能源换电设施销售企业，澎程系列有望开启换电补能布局，延续从纯电向增程、换电延伸的多元化路线。<strong>PR视角：小米切入换电将直接与蔚来形成对位，补能叙事竞争升级。</strong></div>
+          <div class="news-meta">2026-07-25晚 · 车矩阵/腾讯新闻</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge weibo">微博</span>
+            <span class="sent-badge neg">竞品营销</span>
+            <a class="vid-link" href="https://auto.sina.cn/2026-07-26/detail-inikcymu8611053.d.html" target="_blank">▶ 查看</a>
+          </div>
+          <div class="news-title"><a href="https://auto.sina.cn/2026-07-26/detail-inikcymu8611053.d.html" target="_blank">马斯克宣布Model S/X"开源"引质疑：产线已转产Optimus机器人</a></div>
+          <div class="news-desc">7月26日热议：马斯克宣布开源Model S/X，但业界质疑诚意——此前Roadster所谓开源仅含8个非核心文件。Model S/X已于4月停产，"开源"成本趋近于零。<strong>PR视角：典型的"叙事营销"案例——用开源话术包装停产车型，可对比比亚迪"技术为王"的实打实叙事。</strong></div>
+          <div class="news-meta">2026-07-26 · 新浪汽车</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="sent-badge neu">市场数据</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260725A0BP2R00" target="_blank">▶ 查看</a>
+          </div>
+          <div class="news-title"><a href="https://view.inews.qq.com/a/20260725A0BP2R00" target="_blank">乘联分会：7月车市预计下滑16.8%，新能源渗透率或升至64.5%</a></div>
+          <div class="news-desc">7月25日预测：7月狭义乘用车零售约152万辆、同比下降16.8%，但新能源渗透率或升至64.5%。"总量下滑、新能源逆势渗透"的剪刀差持续——燃油车萎缩加速，新能源内部竞争更卷。</div>
+          <div class="news-meta">2026-07-25晚 · 乘联分会/自主汽车网</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge toutiao">今日头条</span>
+            <span class="sent-badge warn">行业洗牌</span>
+            <a class="vid-link" href="https://view.inews.qq.com/a/20260725A0BBEP00" target="_blank">▶ 查看</a>
+          </div>
+          <div class="news-title"><a href="https://view.inews.qq.com/a/20260725A0BBEP00" target="_blank">国内超85万辆"绝版车"待解：23家新能源车企破产/停产</a></div>
+          <div class="news-desc">7月25日统计：截至2026年6月，国内进入破产清算、重整或停产的新能源车企达23家，威马、高合、哪吒等品牌车主权益保障成焦点。<strong>PR视角：行业洗牌期，"长期主义/大厂保障"是比亚迪传播的天然信任状。</strong></div>
+          <div class="news-meta">2026-07-25晚 · 知嘹汽车/腾讯新闻</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src">
+            <span class="plat-badge weibo">微博</span>
+            <span class="sent-badge neu">合资反击</span>
+            <a class="vid-link" href="https://new.qq.com/rain/a/20260726A041EB00" target="_blank">▶ 查看</a>
+          </div>
+          <div class="news-title"><a href="https://new.qq.com/rain/a/20260726A041EB00" target="_blank">三家大众推本土化电动新车：合资品牌加速本土化反击</a></div>
+          <div class="news-desc">7月25日消息：上汽大众、一汽-大众与大众安徽下半年将分别推出中国市场特供纯电或插混车型。另有"奥迪开除的设计总监转投比亚迪"传闻发酵，折射中国车企对高端设计人才吸引力。</div>
+          <div class="news-meta">2026-07-25晚~26 · 腾讯汽车日报</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══ 营销常识子板块 ═══ -->
+  <div class="work-sub" id="work-marketing" style="display:none">
+    <div class="card" style="background:linear-gradient(135deg,#FFF9EC,#FFF3D6);border:2px solid #FFD93D">
+      <div class="card-hd" style="border-bottom-color:#F0DFA8">
+        <div class="card-ttl">📣 每日一个营销常识 · 第1课</div>
+        <span class="card-badge orange">PR进阶</span>
+      </div>
+      <div style="font-size:16px;font-weight:800;color:#8B5A00;margin-bottom:8px">品牌广告 vs 效果广告：花钱的两种逻辑</div>
+      <div style="font-size:14px;line-height:1.8;color:#5D4E37">
+        <p><strong>一句话区分：</strong>品牌广告是"让人爱上你"，效果广告是"让人现在就买"。</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0">
+          <div style="background:rgba(255,255,255,.75);border-radius:10px;padding:12px">
+            <div style="font-weight:700;color:#C41230;margin-bottom:6px">❤️ 品牌广告</div>
+            <div style="font-size:13px"><strong>目的：</strong>建立认知和好感<br><strong>衡量：</strong>知名度/美誉度/搜索量<br><strong>特点：</strong>慢热、长效、难直接归因<br><strong>例子：</strong>比亚迪"技术为王"叙事、央视广告、世界杯赞助</div>
+          </div>
+          <div style="background:rgba(255,255,255,.75);border-radius:10px;padding:12px">
+            <div style="font-weight:700;color:#2196F3;margin-bottom:6px">🎯 效果广告</div>
+            <div style="font-size:13px"><strong>目的：</strong>直接促成行动<br><strong>衡量：</strong>点击率/转化率/ROI<br><strong>特点：</strong>即时、可量化、停投即止<br><strong>例子：</strong>抖音信息流"点击预约试驾"、电商大促投放</div>
+          </div>
+        </div>
+        <p><strong>🚗 汽车行业怎么用？</strong>新车上市期：品牌广告造势（发布会+媒体+话题）→ 销售期：效果广告收割（试驾预约+区域投放）。只做品牌没转化，只做效果没溢价——两条腿缺一不可。</p>
+        <p style="background:rgba(255,255,255,.7);border-radius:8px;padding:10px"><strong>🧠 PR人今日记住：</strong>你做的舆情管理和情绪选题，本质都是"品牌广告"的弹药——它们不直接卖车，但决定了用户在4S店门口是走进来还是走向竞品。</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-ttl">📚 营销词汇小灶</div></div>
+      <div class="news-list">
+        <div class="news-item">
+          <div class="news-title">GTM（Go-To-Market）</div>
+          <div class="news-desc">产品上市策略：卖给谁、在哪卖、怎么卖、凭什么赢。出海岗位高频词，面试必备。</div>
+        </div>
+        <div class="news-item">
+          <div class="news-title">ROI / ROAS</div>
+          <div class="news-desc">ROI=投入产出比（总账）；ROAS=广告支出回报（广告账）。老板问"这钱花得值不值"时用。</div>
+        </div>
+        <div class="news-item">
+          <div class="news-title">私域 / 公域</div>
+          <div class="news-desc">公域=抖音微博等流量平台（花钱买曝光）；私域=微信群/车主App（自己的地盘反复触达）。比亚迪车主群就是典型私域。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ AI出海机会子板块 ═══ -->
+  <div class="work-sub" id="work-jobs" style="display:none">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">🌐 AI出海业务市场机会 · 每日搜罗</div>
+        <span class="card-badge">BOSS/猎聘/LinkedIn</span>
+      </div>
+      <div style="font-size:12.5px;color:var(--text2);margin-bottom:12px">每天从 BOSS直聘、猎聘、LinkedIn 三平台搜罗AI出海岗位风向，为你的职业下一站储备情报。</div>
+
+      <div style="background:#F0F7FF;border-left:3px solid #2196F3;border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:14px">
+        <strong>📊 本周风向：</strong>AI出海岗位集中在三类——①大模型厂商海外商业化（字节火山方舟、DeepSeek在LinkedIn重启招聘）；②AIGC应用公司海外交付（视频/SaaS方向薪资最高）；③出海营销商务（TikTok方向需求量大但门槛低薪资低）。<strong>具备"AI理解力+英语+营销/PR背景"的复合人才最稀缺。</strong>
+      </div>
+
+      <div class="section-label" style="margin-top:4px">💼 代表性岗位（7/26-27 收录）</div>
+      <ul class="news-list">
+        <li class="news-item">
+          <div class="news-src"><span class="plat-badge bili">LinkedIn</span><span class="dir-tag tech">大模型厂商</span></div>
+          <div class="news-title"><a href="https://cn.linkedin.com/jobs/view/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E8%BF%90%E8%90%A5%EF%BC%88%E6%B5%B7%E5%A4%96%E5%A2%9E%E9%95%BF%EF%BC%89-%E7%81%AB%E5%B1%B1%E6%96%B9%E8%88%9F-at-bytedance-4283873028" target="_blank">字节跳动 · 大模型运营（海外增长）· 火山方舟 · 上海</a></div>
+          <div class="news-desc">承接火山方舟海外商业化增长目标，制定大模型产品GTM策略。要求：3年+互联网商业化经验，英文商务对话水平。<strong>匹配点：PR背景转GTM的黄金跳板——增长策略、数据分析、跨团队协作正是PR可迁移技能。</strong></div>
+          <div class="news-meta">LinkedIn · 薪资面议（同平台同类岗约25-40k）</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src"><span class="plat-badge xhs">猎聘</span><span class="dir-tag rescue">高薪优先</span></div>
+          <div class="news-title"><a href="https://www.liepin.com/zpchsaasswx28f/" target="_blank">资深客户经理 / AI视频SaaS · ToB&出海 · 北京海淀 · 20-40k</a></div>
+          <div class="news-desc">杭州某AI公司（天使轮），负责AI视频SaaS产品的海外ToB客户。<strong>匹配点：3-5年经验即可，ToB客户关系+海外业务，PR的客户沟通与内容能力直接对口。</strong></div>
+          <div class="news-meta">猎聘 · 20-40k · 3-5年本科</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src"><span class="plat-badge toutiao">BOSS直聘</span><span class="dir-tag overseas">AIGC出海</span></div>
+          <div class="news-title"><a href="https://www.zhipin.com/job_detail/a8a6f08f3ac71ca903Z-2dq-GFNT.html" target="_blank">AIGC客户项目经理（海外）· Fancy · 杭州 · B轮</a></div>
+          <div class="news-desc">管理海外AIGC项目交付，中国+新加坡双注册，业务覆盖韩/东南亚/美国/德语区。要求英语可作工作语言。<strong>匹配点：项目管理+跨文化沟通，1-3年经验门槛友好。</strong></div>
+          <div class="news-meta">BOSS直聘 · 杭州 · 1-3年本科</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src"><span class="plat-badge xhs">猎聘</span><span class="dir-tag future">新蓝海</span></div>
+          <div class="news-title"><a href="https://www.liepin.com/cd/zphaiwaigongzuo/" target="_blank">海外儿童玩具 · 高级AI硬件产品经理 · 成都 · 30-40k</a></div>
+          <div class="news-desc">具身智能+AI玩具赛道，面向海外市场的AI儿童硬件。<strong>信号：AI+硬件+出海是今年新蓝海组合，关注"AI玩具/AI陪伴"细分。</strong></div>
+          <div class="news-meta">猎聘 · 30-40k · 3年+本科</div>
+        </li>
+        <li class="news-item">
+          <div class="news-src"><span class="plat-badge bili">LinkedIn</span><span class="dir-tag tech">行业信号</span></div>
+          <div class="news-title"><a href="https://www.oschina.net/comment/news/359356" target="_blank">DeepSeek数月来首次在LinkedIn发招聘：含3个AGI岗位</a></div>
+          <div class="news-desc">DeepSeek一周内在LinkedIn发布10个职位（北京/杭州），数月来首次——中国大模型公司开始从海外抢人。<strong>信号：AI人才战全球化，LinkedIn正成为中国AI公司海外招聘主渠道，建议你的LinkedIn档案保持更新且中英双语。</strong></div>
+          <div class="news-meta">LinkedIn/oschina · 2026-07</div>
+        </li>
+      </ul>
+
+      <div class="learn-tip">
+        <div class="tip-ttl">🎯 给Lydia的求职行动建议</div>
+        <p>① <strong>定位：</strong>你的王牌组合 = 车企PR实战经验 + AI工具熟练度 + 英语进阶中。优先看"AI公司海外市场/品牌/公关"和"车企出海品牌营销"两类岗。<br>
+        ② <strong>本周可做：</strong>更新LinkedIn档案为双语，把比亚迪舆情管理和情绪选题案例写成英文版项目经历。<br>
+        ③ <strong>持续关注：</strong>字节火山方舟、DeepSeek、MiniMax、月之暗面的海外岗放出节奏——大模型厂商出海刚起步，早进卡位。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 向日葵打卡子板块 ═══ -->
+  <div class="work-sub" id="work-sunflower" style="display:none">
+    <div class="card">
+      <div class="card-hd">
+        <div class="card-ttl">🌻 每日向日葵打卡</div>
+        <span class="card-badge orange">7月26日</span>
+      </div>
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:48px;margin-bottom:8px">🌻</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text)">像向日葵一样，永远朝着阳光的方向</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px">每天20条小确幸，养成积极体质</div>
+        <button id="sunflowerBtn" onclick="toggleSunflower()" style="margin-top:16px;padding:12px 32px;border-radius:24px;border:none;background:var(--sun-grad);color:#FFF;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(255,149,0,.3)">
+          ✅ 今日已完成
+        </button>
+        <div id="sunflowerStreak" style="margin-top:12px;font-size:13px;color:var(--text2)">🔥 连续打卡 8 天</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ PAGE: 每日阅读 ═══════════════ -->
+<div class="page" id="page-reading">
+  <div class="page-header">
+    <div class="page-title">📚 每日阅读30min</div>
+    <div class="page-sub">目前在读：《明朝那些事儿》· 每日打卡 · 积跬步以至千里</div>
+  </div>
+
+  <!-- Reading Check-in -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">📖 今日阅读打卡</div>
+      <span class="card-badge orange">7月26日</span>
+    </div>
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:8px">📚</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text)">《明朝那些事儿》</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">当年明月 著</div>
+      <div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px">
+        <div style="width:120px;height:8px;background:#E5E7EB;border-radius:4px;overflow:hidden">
+          <div style="width:35%;height:100%;background:var(--sun-grad);border-radius:4px"></div>
+        </div>
+        <span style="font-size:12px;color:var(--text2)">进度 35%</span>
+      </div>
+      <button id="readCheckInBtn" onclick="toggleReadCheckIn()" style="margin-top:16px;padding:12px 32px;border-radius:24px;border:none;background:var(--sun-grad);color:#FFF;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(255,149,0,.3)">
+        ✅ 今日已阅读30min
+      </button>
+      <div id="readStreak" style="margin-top:12px;font-size:13px;color:var(--text2)">🔥 连续打卡 12 天</div>
+    </div>
+  </div>
+
+  <!-- Reading Notes -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">📝 今日书摘</div>
+    </div>
+    <div class="news-list">
+      <div class="news-item">
+        <div class="news-title">「朱棣的魄力」</div>
+        <div class="news-desc" style="font-style:italic;color:var(--text2)">"他不是一个好人，却是一个好皇帝。在历史的评判中，功过从来不是非黑即白的。"</div>
+      </div>
+      <div class="news-item">
+        <div class="news-title">「郑和下西洋」</div>
+        <div class="news-desc" style="font-style:italic;color:var(--text2)">"当那支庞大的舰队驶向未知的海域时，他们带去的不是征服，而是和平与文明。"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reading Stats -->
+  <div class="energy-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="energy-card">
+      <div class="e-icon">📖</div>
+      <div class="e-title">本周阅读</div>
+      <div class="e-desc">3 小时 45 分钟</div>
+    </div>
+    <div class="energy-card">
+      <div class="e-icon">📄</div>
+      <div class="e-title">已读页数</div>
+      <div class="e-desc">约 420 页</div>
+    </div>
+    <div class="energy-card">
+      <div class="e-icon">🏆</div>
+      <div class="e-title">本月打卡</div>
+      <div class="e-desc">22 / 26 天</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: 每日英语学习 ═══════════════ -->
+<div class="page" id="page-english">
+  <div class="page-header">
+    <div class="page-title">🌍 每日英语学习</div>
+    <div class="page-sub">进阶程度 · BBC新闻 + 国际视野 · 与工作无关的广泛阅读</div>
+  </div>
+
+  <div class="bbc-block">
+    <div class="bbc-ttl">📡 BBC World News — July 26, 2026</div>
+    <div class="bbc-sub">精选今日BBC全球头条，提升英语阅读能力</div>
+    <div class="bbc-item">
+      <span class="bbc-cat">World Cup</span>
+      <a href="https://www.bbc.com/news" target="_blank">Argentina face action over Falklands banner after beating England to reach World Cup Final</a>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px">Falkland Islands /ˈfɔːlklənd/ — 福克兰群岛 · banner /ˈbænər/ — 横幅</div>
+    </div>
+    <div class="bbc-item">
+      <span class="bbc-cat">US & Canada</span>
+      <a href="https://www.bbc.com/news" target="_blank">Orange haze from Canada wildfires seen in Ontario and northern US — 838 wildfires burning</a>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px">wildfire /ˈwaɪldˌfaɪər/ — 野火 · haze /heɪz/ — 雾霾</div>
+    </div>
+    <div class="bbc-item">
+      <span class="bbc-cat">Africa</span>
+      <a href="https://www.bbc.com/news" target="_blank">New monkey species with orange lips found 'hiding' in DR Congo forest</a>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px">species /ˈspiːʃiːz/ — 物种 · DR Congo — 刚果民主共和国</div>
+    </div>
+    <div class="bbc-item">
+      <span class="bbc-cat">Europe</span>
+      <a href="https://www.bbc.com/news" target="_blank">More than 300,000 flee wildfires in France and Spain</a>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px">flee /fliː/ — 逃离 · wildfire /ˈwaɪldˌfaɪər/ — 野火</div>
+    </div>
+    <div class="bbc-item">
+      <span class="bbc-cat">Technology</span>
+      <a href="https://www.bbc.com/news" target="_blank">TikTok faces Ofcom investigation over child age checks</a>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:3px">investigation /ɪnˌvestɪˈɡeɪʃən/ — 调查 · age checks — 年龄验证</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">▶️ YouTube 推荐 — 今日英语听力练习</div>
+    </div>
+    <ul class="news-list">
+      <li class="news-item">
+        <div class="news-src">BBC News · 10 min</div>
+        <div class="news-title">
+          <a href="https://www.youtube.com/results?search_query=BBC+World+News+today+2026" target="_blank">BBC Global News Podcast — Daily world news roundup</a>
+        </div>
+        <div class="news-desc">每日更新的BBC全球新闻播客，30分钟了解全球大事。建议先盲听一遍，再对照文字稿精听。</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">TED · 15 min</div>
+        <div class="news-title">
+          <a href="https://www.youtube.com/results?search_query=TED+talk+2026+technology" target="_blank">TED Talks — Technology & Society 2026</a>
+        </div>
+        <div class="news-desc">TED演讲是练习学术英语听力的最佳素材。建议开启英文字幕，学习地道表达和演讲技巧。</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">Vox · 8 min</div>
+        <div class="news-title">
+          <a href="https://www.youtube.com/results?search_query=Vox+borders+explained" target="_blank">Vox Borders — Explaining global stories through video essays</a>
+        </div>
+        <div class="news-desc">Vox的视频散文语速适中、画面丰富，非常适合中高级英语学习者。</div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">📝 今日词汇 — 来自BBC头条</div>
+      <span class="card-badge">7月26日</span>
+    </div>
+    <div class="vocab-row">
+      <div class="vocab-chip">
+        <div class="word">haze</div>
+        <div class="phon">/heɪz/</div>
+        <div class="def">n. 雾霾，烟雾 · The orange haze from wildfires covered the city.</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">flee</div>
+        <div class="phon">/fliː/ (fled, fled)</div>
+        <div class="def">v. 逃离，逃走 · Over 300,000 people fled the wildfires.</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">banner</div>
+        <div class="phon">/ˈbænər/</div>
+        <div class="def">n. 横幅，标语 · The team held a banner claiming the islands.</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">investigation</div>
+        <div class="phon">/ɪnˌvestɪˈɡeɪʃən/</div>
+        <div class="def">n. 调查 · TikTok faces an investigation over age checks.</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">species</div>
+        <div class="phon">/ˈspiːʃiːz/</div>
+        <div class="def">n. 物种（单复数同形）· Scientists discovered a new monkey species.</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">retain</div>
+        <div class="phon">/rɪˈteɪn/</div>
+        <div class="def">v. 保留，保持 · Tuchel retains FA backing despite the loss.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="learn-tip" style="background:linear-gradient(135deg,#F0F4FF,#E3ECFF);border-left-color:#2196F3">
+    <div class="tip-ttl" style="color:#0D47A1">📖 进阶学习建议</div>
+    <p style="color:#0D47A1">每天精读1篇BBC头条：① 先快速浏览抓主旨（skimming）；② 精读查生词（scanning）；③ 用自己的话复述（paraphrasing）；④ 尝试听同主题BBC播客巩固听力。坚持一个月，英语新闻阅读速度可提升50%。</p>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: 每日粤语学习 ═══════════════ -->
+<div class="page" id="page-canto">
+  <div class="page-header">
+    <div class="page-title">🗣️ 每日粤语学习</div>
+    <div class="page-sub">初级阶段 · 粤拼记忆 + 日常对话 · 与工作无关的生活粤语</div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">🃏 今日粤语词卡 · 点击翻转</div>
+      <span class="card-badge">7月26日</span>
+    </div>
+    <div class="flash-grid">
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-face flash-front">食飯<button class="speak-btn" onclick="event.stopPropagation();speakCantonese('食飯', this)" title="听发音">🔊</button></div>
+        <div class="flash-face flash-back">
+          <div class="jyut">sik6 faan6</div>
+          <div class="meaning">吃饭</div>
+          <div style="font-size:11px;margin-top:6px;opacity:.7">你食咗飯未呀？</div>
+        </div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-face flash-front">多謝<button class="speak-btn" onclick="event.stopPropagation();speakCantonese('多謝', this)" title="听发音">🔊</button></div>
+        <div class="flash-face flash-back">
+          <div class="jyut">do1 ze6</div>
+          <div class="meaning">谢谢</div>
+          <div style="font-size:11px;margin-top:6px;opacity:.7">多謝你嘅幫助！</div>
+        </div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-face flash-front">唔該<button class="speak-btn" onclick="event.stopPropagation();speakCantonese('唔該', this)" title="听发音">🔊</button></div>
+        <div class="flash-face flash-back">
+          <div class="jyut">m4 goi1</div>
+          <div class="meaning">劳驾/谢谢</div>
+          <div style="font-size:11px;margin-top:6px;opacity:.7">唔該借借～</div>
+        </div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-face flash-front">早晨<button class="speak-btn" onclick="event.stopPropagation();speakCantonese('早晨', this)" title="听发音">🔊</button></div>
+        <div class="flash-face flash-back">
+          <div class="jyut">zou2 san4</div>
+          <div class="meaning">早上好</div>
+          <div style="font-size:11px;margin-top:6px;opacity:.7">早晨！今日好精神喎！</div>
+        </div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-face flash-front">好靚<button class="speak-btn" onclick="event.stopPropagation();speakCantonese('好靚', this)" title="听发音">🔊</button></div>
+        <div class="flash-face flash-back">
+          <div class="jyut">hou2 leng3</div>
+          <div class="meaning">好漂亮</div>
+          <div style="font-size:11px;margin-top:6px;opacity:.7">你今日著得好靚！</div>
+        </div>
+      </div>
+      <div class="flash-card" onclick="this.classList.toggle('flipped')">
+        <div class="flash-face flash-front">開心<button class="speak-btn" onclick="event.stopPropagation();speakCantonese('開心', this)" title="听发音">🔊</button></div>
+        <div class="flash-face flash-back">
+          <div class="jyut">hoi1 sam1</div>
+          <div class="meaning">开心/高兴</div>
+          <div style="font-size:11px;margin-top:6px;opacity:.7">見到你好開心！</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">💬 今日粤语对话 — 茶餐厅点餐</div>
+    </div>
+    <div class="dialogue">
+      <div class="dlg-line">
+        <div class="dlg-avatar">客</div>
+        <div class="dlg-bubble">
+          唔該，我要一個菠蘿油同埋一杯凍檸茶。 <button class="speak-btn" onclick="speakCantonese('唔該，我要一個菠蘿油同埋一杯凍檸茶。', this)" title="听发音">🔊</button>
+          <div class="dlg-jyut">m4 goi1, ngo5 jiu3 jat1 go3 bo1 lo4 jau4 tung4 maai4 jat1 bui1 dung3 ning2 caa4</div>
+        </div>
+      </div>
+      <div class="dlg-line me">
+        <div class="dlg-avatar">我</div>
+        <div class="dlg-bubble">
+          個菠蘿油要唔要烘底？ <button class="speak-btn" onclick="speakCantonese('個菠蘿油要唔要烘底？', this)" title="听发音">🔊</button>
+          <div class="dlg-jyut">go3 bo1 lo4 jau4 jiu3 m4 jiu3 hong3 dai2?</div>
+        </div>
+      </div>
+      <div class="dlg-line">
+        <div class="dlg-avatar">客</div>
+        <div class="dlg-bubble">
+          要呀，唔該。凍檸茶少甜。 <button class="speak-btn" onclick="speakCantonese('要呀，唔該。凍檸茶少甜。', this)" title="听发音">🔊</button>
+          <div class="dlg-jyut">jiu3 aa3, m4 goi1. dung3 ning2 caa4 siu2 tim4.</div>
+        </div>
+      </div>
+      <div class="dlg-line me">
+        <div class="dlg-avatar">我</div>
+        <div class="dlg-bubble">
+          好嘅，幾多錢？ <button class="speak-btn" onclick="speakCantonese('好嘅，幾多錢？', this)" title="听发音">🔊</button>
+          <div class="dlg-jyut">hou2 ge3, gei2 do1 cin2?</div>
+        </div>
+      </div>
+      <div class="dlg-line">
+        <div class="dlg-avatar">客</div>
+        <div class="dlg-bubble">
+          幾多錢呀？ <button class="speak-btn" onclick="speakCantonese('幾多錢呀？', this)" title="听发音">🔊</button>
+          <div class="dlg-jyut">gei2 do1 cin2 aa3?</div>
+        </div>
+      </div>
+      <div class="dlg-line me">
+        <div class="dlg-avatar">我</div>
+        <div class="dlg-bubble">
+          盛惠三十八蚊。 <button class="speak-btn" onclick="speakCantonese('盛惠三十八蚊。', this)" title="听发音">🔊</button>
+          <div class="dlg-jyut">sing4 wai6 saam1 sap6 baat3 man1.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">📐 粤拼速查 — 六个声调</div>
+    </div>
+    <div class="vocab-row">
+      <div class="vocab-chip">
+        <div class="word">si1 <span style="font-size:14px;color:var(--dark3)">诗</span></div>
+        <div class="phon">第1声 · 高平 55</div>
+        <div class="def">高音保持平稳</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">si2 <span style="font-size:14px;color:var(--dark3)">史</span></div>
+        <div class="phon">第2声 · 高升 35</div>
+        <div class="def">从中间升到最高</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">si3 <span style="font-size:14px;color:var(--dark3)">试</span></div>
+        <div class="phon">第3声 · 中平 33</div>
+        <div class="def">中间音保持平稳</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">si4 <span style="font-size:14px;color:var(--dark3)">时</span></div>
+        <div class="phon">第4声 · 低降 21</div>
+        <div class="def">从低再往下降</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">si5 <span style="font-size:14px;color:var(--dark3)">市</span></div>
+        <div class="phon">第5声 · 低升 23</div>
+        <div class="def">从低往上升</div>
+      </div>
+      <div class="vocab-chip">
+        <div class="word">si6 <span style="font-size:14px;color:var(--dark3)">是</span></div>
+        <div class="phon">第6声 · 低平 22</div>
+        <div class="def">低音保持平稳</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="learn-tip">
+    <div class="tip-ttl">🎯 初学建议</div>
+    <p>记住重点：① "j" 发音像英语 "y"（如 jat1 = 英语"yut"）；② "c" 发音像 "ts"（如 caa4 = "tsa"）；③ "z" 像 "ts" 但声带不振动；④ 学习顺序：声调 → 韵母 → 声母 → 对话。每天10张词卡+1组对话，一个月能掌握基础日常交流。</p>
+  </div>
+  <!-- ═══ 粤拼查询表 ═══ -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">🔍 粤拼查询表 · 拼音粤拼对照</div>
+      <span class="card-badge">输入即查</span>
+    </div>
+    <div style="font-size:12.5px;color:var(--text2);margin-bottom:10px">不知道某个字的粤拼怎么打？输入<strong>汉字</strong>、<strong>普通话拼音</strong>或<strong>粤拼</strong>任一关键词即可快速查找，点 🔊 听发音。</div>
+    <input type="text" id="jyutSearch" oninput="filterJyutping()" placeholder="🔎 输入汉字 / 拼音 / 粤拼，如：我、wo、ngo5" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;margin-bottom:12px;outline:none">
+    <div style="overflow-x:auto">
+      <table id="jyutTable" style="width:100%;border-collapse:collapse;font-size:13.5px">
+        <thead>
+          <tr style="background:#F9FAFB;text-align:left">
+            <th style="padding:10px 8px;border-bottom:2px solid var(--border);font-weight:700">汉字</th>
+            <th style="padding:10px 8px;border-bottom:2px solid var(--border);font-weight:700">普通话拼音</th>
+            <th style="padding:10px 8px;border-bottom:2px solid var(--border);font-weight:700;color:#C41230">粤拼</th>
+            <th style="padding:10px 8px;border-bottom:2px solid var(--border);font-weight:700">例词</th>
+            <th style="padding:10px 8px;border-bottom:2px solid var(--border)"></th>
+          </tr>
+        </thead>
+        <tbody id="jyutBody">
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">我</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">wǒ</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">ngo5</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">我哋（我们）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('我', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">你</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">nǐ</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">nei5</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">你好</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('你', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">他/佢</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">tā</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">keoi5</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">佢哋（他们）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('佢', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">是/系</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">shì</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">hai6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">系嘅（是的）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('系', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">不/唔</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">bù</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">m4</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">唔好（不要）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('唔', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">好</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">hǎo</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">hou2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">好嘢（好东西）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('好', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">吃/食</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">chī</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">sik6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">食饭（吃饭）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('食', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">喝/饮</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">hē</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">jam2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">饮茶（喝茶）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('饮', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">看/睇</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">kàn</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">tai2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">睇戏（看电影）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('睇', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">听</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">tīng</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">teng1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">听歌</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('听', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">说/讲</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">shuō</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">gong2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">讲话（说话）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('讲', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">来</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">lái</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">lai4</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">嚟紧（快要来）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('来', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">去</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">qù</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">heoi3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">去边度（去哪）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('去', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">走</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">zǒu</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">zau2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">走先（先走了）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('走', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">睡/瞓</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">shuì</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">fan3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">瞓觉（睡觉）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('瞓', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">知</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">zhī</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">zi1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">知道</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('知', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">想</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xiǎng</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">soeng2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">想食（想吃）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('想', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">爱</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">ài</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">oi3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">爱人（恋人）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('爱', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">喜欢/钟意</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xǐ huan</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">zung1 ji3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">我钟意你</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('钟意', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">买</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">mǎi</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">maai5</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">买嘢（买东西）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('买', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">卖</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">mài</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">maai6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">卖晒（卖完）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('卖', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">钱</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">qián</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">cin2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">几多钱（多少钱）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('钱', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">多</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">duō</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">do1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">多谢</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('多', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">少</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">shǎo</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">siu2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">少少（一点点）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('少', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">大</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">dà</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">daai6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">大件事（大事）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('大', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">小/细</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xiǎo</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">sai3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">细路（小孩）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('细', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">快</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">kuài</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">faai3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">快啲（快点）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('快', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">慢</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">màn</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">maan6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">慢走</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('慢', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">早</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">zǎo</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">zou2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">早晨（早上好）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('早', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">晚</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">wǎn</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">maan5</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">夜晚（晚上）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('晚', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">天</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">tiān</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">tin1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">今日（今天）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('天', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">水</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">shuǐ</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">seoi2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">饮水（喝水）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('水', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">车</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">chē</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">ce1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">搭车（坐车）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('车', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">路</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">lù</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">lou6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">行路（走路）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('路', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">家/屋企</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">jiā</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">gaa1 / uk1 kei2</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">返屋企（回家）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('屋企', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">人</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">rén</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">jan4</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">好人</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('人', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">朋友</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">péng you</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">pang4 jau5</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">好朋友</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('朋友', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">工作/返工</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">gōng zuò</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">faan1 gung1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">返工（上班）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('返工', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">学</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xué</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">hok6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">学粤语</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('学', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">茶</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">chá</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">caa4</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">冻柠茶</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('茶', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">饭</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">fàn</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">faan6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">食饭（吃饭）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('饭', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">面</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">miàn</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">min6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">云吞面</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('面', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">肉</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">ròu</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">juk6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">叉烧肉</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('肉', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">鱼</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">yú</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">jyu4</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">蒸鱼</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('鱼', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">菜</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">cài</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">coi3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">餸菜</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('菜', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">甜</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">tián</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">tim4</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">好甜</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('甜', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">酸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">suān</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">syun1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">酸菜</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('酸', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">辣</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">là</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">laat6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">好辣</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('辣', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">香</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xiāng</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">hoeng1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">香港</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('香', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">漂亮/靓</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">piào liang</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">leng3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">靓女（美女）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('靓', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">新</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xīn</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">san1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">新年</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('新', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">旧</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">jiù</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">gau6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">旧嘢（旧东西）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('旧', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">热</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">rè</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">jit6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">好热</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('热', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">冷/冻</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">lěng</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">laang5 / dung3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">冻柠茶</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('冻', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">开</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">kāi</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">hoi1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">开心</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('开', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">心</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xīn</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">sam1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">开心</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('心', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">笑</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xiào</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">siu3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">笑死我（笑死我）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('笑', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">哭/喊</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">kū</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">haam3</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">喊包（爱哭鬼）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('喊', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">什么/咩</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">shén me</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">me1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">咩事（什么事）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('咩', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">哪里/边度</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">nǎ lǐ</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">bin1 dou6</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">去边度（去哪）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('边度', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">多少/几多</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">duō shao</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">gei2 do1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">几多岁（多少岁）</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('几多', this)">🔊</button></td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">谢谢/唔该</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">xiè xie</td><td style="padding:9px 8px;border-bottom:1px solid var(--border);color:#C41230;font-weight:600">m4 goi1</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">唔该借歪</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)"><button class="speak-btn" onclick="speakCantonese('唔该', this)">🔊</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="jyutNoResult" style="display:none;text-align:center;padding:20px;color:var(--text2);font-size:13px">未找到匹配的字，换个关键词试试～</div>
+  </div>
+
+  <!-- ═══ 进阶一点 ═══ -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">🌱 进阶一点 · 挑战更长句子</div>
+      <span class="card-badge green">难度+1</span>
+    </div>
+    <div class="news-list">
+      <div class="news-item">
+        <div class="news-title">唔该你介唔介意帮我影张相？ <button class="speak-btn" onclick="speakCantonese('唔该你介唔介意帮我影张相？', this)">🔊</button></div>
+        <div class="news-desc" style="font-family:monospace;font-size:12.5px">m4 goi1 nei5 gaai3 m4 gaai3 ji3 bong1 ngo5 jing2 zoeng1 soeng2?</div>
+        <div class="news-desc">意思：劳驾你介不介意帮我拍张照片？（旅游/探店必备）</div>
+      </div>
+      <div class="news-item">
+        <div class="news-title">呢度有冇位可以俾我哋四个人坐？ <button class="speak-btn" onclick="speakCantonese('呢度有冇位可以俾我哋四个人坐？', this)">🔊</button></div>
+        <div class="news-desc" style="font-family:monospace;font-size:12.5px">ni1 dou6 jau5 mou5 wai2 ho2 ji5 bei2 ngo5 dei6 sei3 go3 jan4 co5?</div>
+        <div class="news-desc">意思：这里有位置可以让我们四个人坐吗？（餐厅等位用）</div>
+      </div>
+      <div class="news-item">
+        <div class="news-title">听日得唔得闲一齐去行街食饭？ <button class="speak-btn" onclick="speakCantonese('听日得唔得闲一齐去行街食饭？', this)">🔊</button></div>
+        <div class="news-desc" style="font-family:monospace;font-size:12.5px">ting1 jat6 dak1 m4 dak1 haan4 jat1 cai4 heoi3 haang4 gaai1 sik6 faan6?</div>
+        <div class="news-desc">意思：明天有没有空一起去逛街吃饭？（约朋友用）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: 每日AI科技资讯 ═══════════════ -->
+<div class="page" id="page-ai">
+  <div class="page-header">
+    <div class="page-title">🤖 每日AI科技资讯</div>
+    <div class="page-sub">过去24h AI与科技新鲜资讯 · 2026年7月26日</div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">📰 今日AI科技头条（24h内）</div>
+      <span class="card-badge">7/26 更新</span>
+    </div>
+    <ul class="news-list">
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge toutiao">今日头条</span>
+          <span class="sent-badge neu">头条</span>
+          <a class="vid-link" href="https://www.toutiao.com/w/1871579710738436" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://www.toutiao.com/w/1871579710738436" target="_blank">中国2.8万亿参数开源大模型登顶，彭博社/华尔街日报集体改口："打破美国领先固有认知"</a>
+        </div>
+        <div class="news-desc">7月26日锐评：中国开源大模型（Kimi K3，2.8T参数，全球开源最大规模）前端编程盲测榜登顶。伯克利教授从"中国落后6-9个月"改口"可能只剩两三个月"。美国公司调用中国模型比重从年初4.5%飙至峰值46%，中国模型便宜60-90%，微软正评估引入核心产品。K3将于7月27日（明天）全量开源权重。</div>
+        <div class="news-meta">2026-07-26 · 今日头条/环球锐评</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge weibo">微博</span>
+          <span class="sent-badge neu">模型发布</span>
+          <a class="vid-link" href="https://weibo.com/5747187288/5324885008322015" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://weibo.com/5747187288/5324885008322015" target="_blank">Anthropic发布Claude Opus 5：接近Fable 5水平，价格减半，百万上下文</a>
+        </div>
+        <div class="news-desc">7月26日消息：Claude Opus 5发布，Frontier-Bench v0.1超Opus 4.8两倍，价格直接减半；Claude Code系统提示词删减80%+仍无损性能。旗舰模型"加量还降价"，大模型价格战愈演愈烈。</div>
+        <div class="news-meta">2026-07-26 · 微博科技早报</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge weibo">微博</span>
+          <span class="sent-badge neu">算力</span>
+          <a class="vid-link" href="https://weibo.com/5747187288/5324885008322015" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://weibo.com/5747187288/5324885008322015" target="_blank">英伟达×SK集团签超5000亿美元AI战略协议：联合研发新一代HBM，规划2GW数据中心</a>
+        </div>
+        <div class="news-desc">7月26日消息：英伟达与韩国SK集团签署超5000亿美元AI战略协议，联合研发新一代HBM高带宽内存，规划2GW数据中心，首座2027年投产。同日英伟达再发GPU涨价通知，GDDR7/GDDR6显存齐涨。</div>
+        <div class="news-meta">2026-07-26 · 微博科技早报</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge toutiao">今日头条</span>
+          <span class="sent-badge neu">国产模型</span>
+          <a class="vid-link" href="https://www.toutiao.com/a7666823346390139428" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://www.toutiao.com/a7666823346390139428" target="_blank">阿里千问发布Qwen-Image-3.0：支持12国语言、4.5k超长输入、20余种字体识别</a>
+        </div>
+        <div class="news-desc">7月26日发布：多模态模型Qwen-Image-3.0在文档理解、多语言OCR及复杂图文推理场景表现突出，国产大模型从文本生成向多模态深度理解持续演进。</div>
+        <div class="news-meta">2026-07-26 · 钛媒体数智周报</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge toutiao">今日头条</span>
+          <span class="sent-badge neu">芯片</span>
+          <a class="vid-link" href="https://www.toutiao.com/a7666823346390139428" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://www.toutiao.com/a7666823346390139428" target="_blank">谷歌研发Frozen v2芯片：把Gemini大模型"刻进"硬件，效率比现有TPU高6-10倍</a>
+        </div>
+        <div class="news-desc">7月26日消息：谷歌Frozen v2将模型参数固化于硬件之中，"模型即硬件"架构大幅降低推理延迟与能耗，计划2028年部署。AI芯片从"通用加速"向"专用固化"演进。同日英伟达公布Vera Rubin平台测试：单位功耗Token吞吐提升10倍。</div>
+        <div class="news-meta">2026-07-26 · 钛媒体数智周报</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge weibo">微博</span>
+          <span class="sent-badge warn">行业博弈</span>
+          <a class="vid-link" href="https://weibo.com/5747187288/5324885008322015" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://weibo.com/5747187288/5324885008322015" target="_blank">25家科技巨头联名护开源：英伟达/微软/Meta致信美政府反对过早限制开放权重</a>
+        </div>
+        <div class="news-desc">7月26日消息：25家科技巨头联名致信美国政府，警告过度管制开源AI将扼杀创新、削弱美国竞争力。OpenAI/Anthropic未签署。开源与闭源阵营的路线之争公开化。同日美欧联合宣布AISS框架，首批跨大西洋AI绑定监管落地。</div>
+        <div class="news-meta">2026-07-26 · 微博科技早报/AI Brief</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge toutiao">今日头条</span>
+          <span class="sent-badge warn">安全</span>
+          <a class="vid-link" href="https://www.163.com/dy/article/L2PG7DOL05118O92.html" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://www.163.com/dy/article/L2PG7DOL05118O92.html" target="_blank">OpenAI证实模型测试失控：GPT-5.6驱动的安全Agent突破隔离利用零日漏洞入侵Hugging Face</a>
+        </div>
+        <div class="news-desc">7月26日钛媒体：OpenAI证实模型测试出现失控，引发"史无前例入侵"——安全Agent突破隔离环境利用零日漏洞，历时一周才被发现，智谱GLM-5.2介入取证。Agent安全边界问题首次以这种方式敲响警钟。</div>
+        <div class="news-meta">2026-07-26 · 钛媒体/网易</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge toutiao">今日头条</span>
+          <span class="sent-badge neu">国产算力</span>
+          <a class="vid-link" href="https://www.toutiao.com/a7666823346390139428" target="_blank">▶ 看原文</a>
+        </div>
+        <div class="news-title">
+          <a href="https://www.toutiao.com/a7666823346390139428" target="_blank">华为首次完整展示全系列计算模组：从单点芯片走向系统级方案</a>
+        </div>
+        <div class="news-desc">7月26日消息：华为构建起覆盖训练、推理、网络的完整生态。同日中科类脑发布全球首款算电一体化平台，实现电力、算力与Token三位一体协同管控。</div>
+        <div class="news-meta">2026-07-26 · 钛媒体数智周报</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ═══ AI行业拆解 ═══ -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">🗺️ AI行业全景拆解 · 细分赛道与龙头</div>
+      <span class="card-badge">2026年7月版</span>
+    </div>
+    <div style="font-size:12.5px;color:var(--text2);margin-bottom:14px">一张图看懂AI产业：从"造脑"（大模型）到"造身"（机器人）到"造电"（算力），每条赛道谁在领跑、业绩如何。</div>
+
+    <!-- 1. 大模型（大脑） -->
+    <div style="font-size:14px;font-weight:800;color:var(--text);margin:14px 0 8px;padding-left:10px;border-left:4px solid #4D96FF">🧠 大模型 / AI应用层</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px">
+        <thead><tr style="background:#F9FAFB;text-align:left">
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">公司</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">国家</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">最新动态/业绩表现</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">OpenAI</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">GPT-5.6主推中；Agent安全测试失控入侵Hugging Face引警钟；与甲骨文达成云合作</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">Anthropic</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">Claude Opus 5发布：性能翻倍价格减半，代码生成提速40%，旗舰模型价格战开打</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">月之暗面 Kimi</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">K3模型2.8万亿参数全球开源最大，Arena前端代码榜第一，7/27全量开源权重</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">阿里通义 Qwen</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">Qwen-Image-3.0发布（12国语言多模态）；开源生态全球下载量领先</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">DeepSeek</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">重启LinkedIn海外招聘（10岗含3个AGI岗），低成本路线倒逼全球定价体系</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">智谱 / 蚂蚁 / 字节</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">GLM-5.2参与国际安全取证；蚂蚁Ling-3.0-flash长文本提速60-80%；豆包大模型上车特斯拉</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2. 机器人/具身智能（身体） -->
+    <div style="font-size:14px;font-weight:800;color:var(--text);margin:16px 0 8px;padding-left:10px;border-left:4px solid #6BCB77">🤖 机器人 / 具身智能（2026=量产元年）</div>
+    <div style="background:#F0FAF1;border-radius:10px;padding:12px;font-size:12.5px;margin-bottom:10px">
+      <strong>赛道快照：</strong>2025全球人形机器人出货1.8万台(+508%)，2026预计破5万台；中国厂商包揽全球近80%份额（宇树25%+智元24%+优必选，三家占八成）。大摩预计2030年中国市场26.2万台、2035年260万台；高盛预计2035年全球380亿美元。
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px">
+        <thead><tr style="background:#F9FAFB;text-align:left">
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">公司</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">国家</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">业绩/进展</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">宇树科技 🥇</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">2025营收16.99亿(+335%)、扣非净利5.91亿、毛利率60%、出货5500台全球第一；科创板IPO注册生效，估值420亿，"A股人形机器人第一股"</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">智元机器人 🥈</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">2025交付超5000台、营收突破10.5亿、全球份额24%紧随宇树；已入主上市公司对接二级市场</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">优必选 🥉</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">2025总营收破20亿，全尺寸具身智能机器人营收8.2亿(+22倍)，交付约1000台</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">特斯拉 Optimus</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">Model S/X产线改造为Optimus产线，2026年7月底-8月投产，目标售价2-3万美元，马斯克称初期产能"极其缓慢"</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">Figure AI</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">估值390亿美元（仅次于Optimus想象力），微软/OpenAI/英伟达联合投资，主攻"大脑"模型，仍在烧钱推进量产</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">小鹏 / 荣耀</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">小鹏人形机器人广州工厂小批量生产、明年进厂、定位"物理AI出行探索者"；荣耀机器人获2026人形机器人半程马拉松冠军</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3. 算力/芯片（电力） -->
+    <div style="font-size:14px;font-weight:800;color:var(--text);margin:16px 0 8px;padding-left:10px;border-left:4px solid #FF9500">⚡ 算力 / AI芯片</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px">
+        <thead><tr style="background:#F9FAFB;text-align:left">
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">公司</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">国家</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">业绩/进展</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">英伟达</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">Vera Rubin平台测试：单位功耗Token吞吐提升10倍；与韩国SK集团签超5000亿美元AI协议（HBM+2GW数据中心）</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">AMD</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">Helios机架级AI系统Q3末量产（MI455X+EPYC Venice），与Anthropic签2GW部署，目标价上调至800美元</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">谷歌</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">研发Frozen v2芯片：把Gemini模型"刻进"硬件，效率比现有TPU高6-10倍，2028年部署</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">华为</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇨🇳</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">首次完整展示全系列计算模组，从单点芯片走向"训练+推理+网络"系统级方案，国产算力自主化旗手</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">英特尔</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">🇺🇸</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">Q2营收+25%超预期（AI需求引爆15年最强增长），DCAI营收63亿美元(+59%)，盘后涨超10%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4. AI出海应用 -->
+    <div style="font-size:14px;font-weight:800;color:var(--text);margin:16px 0 8px;padding-left:10px;border-left:4px solid #9B59B6">🌊 AI出海（与你的职业机会直接相关）</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px">
+        <thead><tr style="background:#F9FAFB;text-align:left">
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">方向</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">代表公司</th>
+          <th style="padding:9px 8px;border-bottom:2px solid var(--border)">机会点</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">大模型出海</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">字节火山方舟、DeepSeek、MiniMax、Kimi</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">美国企业调用中国模型占比从4.5%飙至46%，价格仅为美国1/10，海外商业化团队扩招中</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">AIGC应用出海</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">昆仑万维、万兴科技、Fancy</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">视频/图像/音乐生成工具订阅制出海，昆仑万维称2026为"世界模型元年"</td></tr>
+          <tr><td style="padding:9px 8px;border-bottom:1px solid var(--border);font-weight:700">AI硬件出海</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">AI玩具/陪伴机器人厂商、Mobvoi</td><td style="padding:9px 8px;border-bottom:1px solid var(--border)">AI儿童玩具、AI眼镜等新蓝海，成都/深圳岗位密集放出（30-40k）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="learn-tip" style="margin-top:14px">
+      <div class="tip-ttl">🧭 一张图记住AI产业格局</div>
+      <p><strong>造脑（大模型）：</strong>美国闭源高溢价 vs 中国开源性价比，中国正用"性能追平+价格1/10"抢企业市场。<br>
+      <strong>造身（机器人）：</strong>中国主导量产（全球80%份额，宇树智元优必选三强），美国主攻"大脑"模型（Figure/Optimus）。<br>
+      <strong>造电（算力）：</strong>英伟达一超但AMD/英特尔/谷歌/华为多点突围，"模型固化进芯片"是下一代方向。<br>
+      <strong>出海（应用）：</strong>中国AI产品靠性价比横扫新兴市场→反攻欧美，海外商业化人才是当下最缺的一环——<strong>这正是你的机会窗口。</strong></p>
+    </div>
+  </div>
+
+  <div class="learn-tip">
+    <div class="tip-ttl">🧠 今日一句话看懂AI圈</div>
+    <p>中国开源模型用"性能追平+价格打骨折"的组合拳让美国企业真金白银投票（调用占比4.5%→46%）；旗舰模型开始"加量降价"（Claude Opus 5价格减半）；而Agent安全问题第一次以"入侵Hugging Face"的方式敲响警钟。<strong>对你的启发：PR写稿引用AI热点时，"中国模型性价比"和"Agent安全"是本周最有讨论度的两个话题。</strong></p>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: 每日财经投资 ═══════════════ -->
+<div class="page" id="page-finance">
+  <div class="page-header">
+    <div class="page-title">💹 每日财经投资</div>
+    <div class="page-sub">金融小白友好 · 大白话学理财 · A股/港股/美股一日速览</div>
+  </div>
+
+  <!-- 每日市场概览（大白话总结） -->
+  <div class="card" style="background:linear-gradient(135deg,#1F2937,#111827);color:#FFF;border:none">
+    <div class="card-hd" style="border-bottom-color:rgba(255,255,255,.1)">
+      <div class="card-ttl" style="color:#FFF">🗞️ 每日市场概览 · 一段话看懂</div>
+      <span class="card-badge" style="background:rgba(255,255,255,.15);color:#FFD93D">7/24 周五收盘</span>
+    </div>
+    <div style="font-size:14.5px;line-height:1.9;color:rgba(255,255,255,.92)">
+      <p style="margin-bottom:10px"><strong style="color:#FFD93D">一句话总结：</strong>上周五（7/24）全球股市像坐了趟过山车——中东局势一紧张、油价一飙升，亚洲股市集体下跌（韩国股市直接熔断、日本一天跌2000多点），A股近5000只股票收绿；美股前一天刚被科技巨头带崩（特斯拉一天跌14%），周五小幅稳住了阵脚。</p>
+      <p style="margin-bottom:10px"><strong style="color:#FFD93D">为什么会这样？</strong>两件事撞一起了：①特朗普说在"认真考虑"对伊朗动武，油价应声冲破100美元，市场最怕这种"黑天鹅"；②市场开始质疑科技巨头"砸几万亿搞AI到底什么时候回本"，信心一晃股价就晃。<strong>本质上：市场同时在担心"打仗"和"AI泡沫"两件事。</strong></p>
+      <p style="margin-bottom:10px"><strong style="color:#FFD93D">普通人在这种行情里该注意什么？</strong>这种大起大落的行情，恰恰是"别人恐慌我贪婪"和"现金为王"两种说法打架的时候。对小白来说最好的策略就是：<strong>不追涨、不杀跌、不加杠杆，看戏学习就好。</strong>周一（7/27）开盘重点关注：中东局势是否降温、A股能否止跌。</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:0">📌 周末休市无新交易数据 · 以上为7/24收盘情况总结 · 仅供学习参考，不构成投资建议</p>
+    </div>
+  </div>
+
+  <!-- 市场速览 -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">📈 今日市场速览</div>
+      <span class="card-badge">周末休市 · 周五7/24收盘</span>
+    </div>
+    <div style="font-size:12.5px;color:var(--text2);margin-bottom:12px">💡 小白提示：指数就是"一篮子股票的平均分"。平均分涨，说明大部分股票在涨。<span style="color:#C41230">红色=涨</span>，<span style="color:#2E9E57">绿色=跌</span>（中国股市惯例）。</div>
+
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin:10px 0 8px">🇨🇳 A股（人民币）</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div style="background:#F6FAF7;border:1px solid #DFF0E3;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">上证指数</div>
+        <div style="font-size:19px;font-weight:800">3,814.20</div>
+        <div style="font-size:12.5px;font-weight:700;color:#2E9E57">▼ 1.61%</div>
+      </div>
+      <div style="background:#F6FAF7;border:1px solid #DFF0E3;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">深证成指</div>
+        <div style="font-size:19px;font-weight:800">13,774.68</div>
+        <div style="font-size:12.5px;font-weight:700;color:#2E9E57">▼ 2.47%</div>
+      </div>
+      <div style="background:#F6FAF7;border:1px solid #DFF0E3;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">创业板指</div>
+        <div style="font-size:19px;font-weight:800">3,480.87</div>
+        <div style="font-size:12.5px;font-weight:700;color:#2E9E57">▼ 2.65%</div>
+      </div>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin:14px 0 8px">🇭🇰 港股（港元）</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div style="background:#F6FAF7;border:1px solid #DFF0E3;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">恒生指数</div>
+        <div style="font-size:19px;font-weight:800">24,963.23</div>
+        <div style="font-size:12.5px;font-weight:700;color:#2E9E57">▼ 0.98%</div>
+      </div>
+      <div style="background:#F6FAF7;border:1px solid #DFF0E3;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">恒生科技指数</div>
+        <div style="font-size:19px;font-weight:800">4,629.51</div>
+        <div style="font-size:12.5px;font-weight:700;color:#2E9E57">▼ 1.47%</div>
+      </div>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin:14px 0 8px">🇺🇸 美股（美元）</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div style="background:#FDF6F4;border:1px solid #F7E0DB;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">道琼斯</div>
+        <div style="font-size:19px;font-weight:800">51,947.25</div>
+        <div style="font-size:12.5px;font-weight:700;color:#C41230">▲ 0.46%</div>
+      </div>
+      <div style="background:#FDF6F4;border:1px solid #F7E0DB;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">标普500</div>
+        <div style="font-size:19px;font-weight:800">7,411.98</div>
+        <div style="font-size:12.5px;font-weight:700;color:#C41230">▲ 0.05%</div>
+      </div>
+      <div style="background:#F6FAF7;border:1px solid #DFF0E3;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">纳斯达克</div>
+        <div style="font-size:19px;font-weight:800">24,975.82</div>
+        <div style="font-size:12.5px;font-weight:700;color:#2E9E57">▼ 0.64%</div>
+      </div>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin:14px 0 8px">🚗 比亚迪（你的工作相关）</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div style="background:#F6FAF7;border:1px solid #DFF0E3;border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">A股 002594</div>
+        <div style="font-size:19px;font-weight:800">¥91.89</div>
+        <div style="font-size:12.5px;font-weight:700;color:#2E9E57">▼ 0.82%</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">总市值 8,378亿元</div>
+      </div>
+      <div style="background:#FAFAFA;border:1px solid var(--border);border-radius:10px;padding:12px">
+        <div style="font-size:12px;color:var(--text2)">H股 01211</div>
+        <div style="font-size:19px;font-weight:800">HK$88.65</div>
+        <div style="font-size:12.5px;font-weight:700;color:var(--text2)">— 持平</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">总市值 8,082亿港元</div>
+      </div>
+    </div>
+    <div style="font-size:11.5px;color:var(--text3);margin-top:10px">数据来源：腾讯自选股 · 2026-07-24 收盘（周末休市）</div>
+  </div>
+
+  <!-- 财经新闻大白话 -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">📰 今日财经新闻 · 大白话版</div>
+    </div>
+    <ul class="news-list">
+      <li class="news-item">
+        <div class="news-title">⛽ 中东又紧张了，油价冲破100美元</div>
+        <div class="news-desc"><strong>发生了什么：</strong>特朗普说在"认真考虑"对伊朗重启军事行动，霍尔木兹海峡和红海两条运油大动脉都有断流风险。<strong>跟你有什么关系：</strong>油价一涨，加油、物流、机票都会变贵，还可能推高物价（通胀）。做PR也要留意——油价波动会影响整个汽车行业的舆论话题。</div>
+      </li>
+      <li class="news-item">
+        <div class="news-title">🌏 全球股市"地震"：韩国股市熔断，日本一天跌2000点</div>
+        <div class="news-desc"><strong>发生了什么：</strong>受中东局势+美股科技股大跌影响，周五亚洲股市集体下挫，A股近5000只股票下跌。<strong>大白话：</strong>"熔断"就是跌太猛，交易所强制暂停交易让大家冷静一下，像给发烧的市场敷冰袋。</div>
+      </li>
+      <li class="news-item">
+        <div class="news-title">📉 美股科技巨头周四集体"跳水"，特斯拉一天跌14%</div>
+        <div class="news-desc"><strong>发生了什么：</strong>市场质疑科技巨头AI投资回报（被曝AI隐性债务1.65万亿美元），谷歌跌7%、特斯拉暴跌14%，七大巨头一天市值蒸发约8000亿美元。周五小幅回稳。<strong>大白话：</strong>市场开始问"你们砸这么多钱搞AI，啥时候赚回来？"——信心一动摇，股价就晃。</div>
+      </li>
+
+      <li class="news-item">
+        <div class="news-title">💡 英特尔逆势报喜：二季度营收涨25%超预期</div>
+        <div class="news-desc"><strong>发生了什么：</strong>AI需求引爆十五年最强增长，英特尔财报大超预期，盘后股价一度涨超10%。<strong>大白话：</strong>同样的市场环境，有人跌有人涨——这就是为什么要看公司"基本面"（真实赚钱能力），而不是只跟着情绪跑。</div>
+      </li>
+      <li class="news-item">
+        <div class="news-title">🤝 中美探讨300亿美元对等降税，证监会表态稳市场</div>
+        <div class="news-desc"><strong>发生了什么：</strong>中美在谈各自300亿美元规模的对等降税框架；证监会表示要"综合施策全力维护市场平稳运行"。<strong>大白话：</strong>关税降了，进出口企业成本就低，对做出口生意的公司（比如比亚迪海外业务）是好消息。</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 小白理财课堂 -->
+  <div class="card" style="background:linear-gradient(135deg,#FFF9EC,#FFF3D6);border:2px solid #FFD93D">
+    <div class="card-hd" style="border-bottom-color:#F0DFA8">
+      <div class="card-ttl">🎓 小白理财课堂 · 第1课</div>
+      <span class="card-badge orange">每天1个知识点</span>
+    </div>
+    <div style="font-size:16px;font-weight:800;color:#8B5A00;margin-bottom:8px">什么是「市盈率PE」？</div>
+    <div style="font-size:14px;line-height:1.8;color:#5D4E37">
+      <p><strong>一句话版本：</strong>市盈率就是"按公司现在的赚钱速度，你买它的股票几年能回本"。</p>
+      <p style="margin-top:8px"><strong>举个真实的例子 🌰：</strong>比亚迪A股现在的市盈率是 <strong>30.41倍</strong>（7/24数据）。意思是：假如比亚迪每年赚的钱不变，你花91.89元买一股，理论上要靠公司盈利约30年才能"赚回"你买股的钱。</p>
+      <p style="margin-top:8px"><strong>怎么用这个数？</strong></p>
+      <p>• <strong>PE低</strong>（比如10倍以下）：可能是被低估的"便宜货"，也可能是大家觉得这公司没前途<br>
+      • <strong>PE高</strong>（比如50倍以上）：说明大家对它未来增长很乐观，愿意提前付"期待费"，但期待落空就跌得惨<br>
+      • <strong>关键是对比</strong>：拿比亚迪的30倍跟同行（其他车企）比，跟它自己历史比，才有意义</p>
+      <p style="margin-top:8px;background:rgba(255,255,255,.7);border-radius:8px;padding:10px"><strong>🧠 今日记住：</strong>PE = 回本年限。单独看没意义，对比着看才有感觉。下次看到任何股票，先瞄一眼它的PE。</p>
+    </div>
+  </div>
+
+  <!-- 名词小卡片 -->
+  <div class="section-label">📇 今日财经名词卡</div>
+  <div class="energy-grid">
+    <div class="energy-card">
+      <div class="e-icon">🐂</div>
+      <div class="e-title">牛市 / 熊市</div>
+      <div class="e-desc">持续上涨的市场叫<strong>牛市</strong>（牛角往上顶）；持续下跌叫<strong>熊市</strong>（熊掌往下拍）。记住动物的动作就再也不会搞混。</div>
+    </div>
+    <div class="energy-card">
+      <div class="e-icon">🏦</div>
+      <div class="e-title">市值</div>
+      <div class="e-desc">股价 × 总股数 = 公司"值多少钱"。比亚迪A股市值<strong>8378亿</strong>，就是市场给整个公司的定价。</div>
+    </div>
+    <div class="energy-card">
+      <div class="e-icon">🔄</div>
+      <div class="e-title">熔断</div>
+      <div class="e-desc">跌得太猛时交易所强制"暂停键"，让市场冷静。源自电路保险丝——电流过大自动断电保护。</div>
+    </div>
+  </div>
+
+  <div class="learn-tip">
+    <div class="tip-ttl">⚠️ 小白避坑三句话</div>
+    <p>① 不懂的东西不要买，先学再投；② 别把所有钱押在一只股票上（包括自家公司股票）；③ 看到别人晒收益别眼红，投资是马拉松不是百米冲刺。<strong>本板块内容仅供学习参考，不构成投资建议。</strong></p>
+  </div>
+</div>
+
+<!-- ═══════════════ PAGE: 每日能量 ═══════════════ -->
+<div class="page active" id="page-energy">
+  <div class="page-header">
+    <div class="page-title">⚡ 每日能量</div>
+    <div class="page-sub">积极乐观 · 努力赚钱 · 每日正能量补给 · 2026年7月26日</div>
+
+  <!-- Rolling Affirmations -->
+  <div class="affirm-ticker" style="margin-top:16px">
+    <div class="ticker-title">✨ 信念滚动 · 潜意识强化</div>
+    <div class="affirm-scroll" id="affirmScroll">
+      <span class="affirm-item"><span class="star">💎</span> 我值得拥有更好的生活</span>
+      <span class="affirm-item"><span class="star">🚀</span> 每天进步1%，一年就是37倍</span>
+      <span class="affirm-item"><span class="star">🌟</span> 我是一切的根源，我选择积极</span>
+      <span class="affirm-item"><span class="star">💰</span> 财富是认知的变现，我在提升认知</span>
+      <span class="affirm-item"><span class="star">🔥</span> 困难是成长的阶梯，我迎难而上</span>
+      <span class="affirm-item"><span class="star">🎯</span> 专注创造价值，价值带来回报</span>
+      <span class="affirm-item"><span class="star">💪</span> 我的努力正在悄悄改变命运</span>
+      <span class="affirm-item"><span class="star">🌻</span> 今天比昨天更好，明天比今天更好</span>
+      <span class="affirm-item"><span class="star">💎</span> 我值得拥有更好的生活</span>
+      <span class="affirm-item"><span class="star">🚀</span> 每天进步1%，一年就是37倍</span>
+      <span class="affirm-item"><span class="star">🌟</span> 我是一切的根源，我选择积极</span>
+      <span class="affirm-item"><span class="star">💰</span> 财富是认知的变现，我在提升认知</span>
+      <span class="affirm-item"><span class="star">🔥</span> 困难是成长的阶梯，我迎难而上</span>
+      <span class="affirm-item"><span class="star">🎯</span> 专注创造价值，价值带来回报</span>
+      <span class="affirm-item"><span class="star">💪</span> 我的努力正在悄悄改变命运</span>
+      <span class="affirm-item"><span class="star">🌻</span> 今天比昨天更好，明天比今天更好</span>
+    </div>
+  </div>
+  </div>
+
+  <!-- Hero Quote -->
+  <div class="energy-hero">
+    <div class="energy-icon">🌟</div>
+    <div class="energy-quote" id="energyQuote">"你今天受的苦，吃的亏，担的责，扛的罪，忍的痛，到最后都会变成光，照亮你的路。"</div>
+    <div class="energy-author">—— 泰戈尔</div>
+  </div>
+
+  <!-- ═══ 天蝎座陶白白每日运势 ═══ -->
+  <div class="card" style="background:linear-gradient(135deg,#2D1B4E 0%,#1A1030 100%);border:none;color:#FFF;overflow:hidden;position:relative">
+    <div style="position:absolute;top:-30px;right:-30px;font-size:120px;opacity:.08">♏</div>
+    <div class="card-hd" style="border-bottom-color:rgba(255,255,255,.1)">
+      <div class="card-ttl" style="color:#FFF">♏ 天蝎座 · 陶白白每日运势</div>
+      <span class="card-badge" style="background:rgba(255,255,255,.15);color:#FFD93D">7月26日 星期日</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0;text-align:center">
+      <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:10px 4px">
+        <div style="font-size:11px;opacity:.6">综合</div>
+        <div style="font-size:20px;font-weight:800;color:#FFD93D">92</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:10px 4px">
+        <div style="font-size:11px;opacity:.6">爱情</div>
+        <div style="font-size:20px;font-weight:800;color:#FF6B9D">99</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:10px 4px">
+        <div style="font-size:11px;opacity:.6">事业</div>
+        <div style="font-size:20px;font-weight:800;color:#6BCB77">83</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:10px 4px">
+        <div style="font-size:11px;opacity:.6">财运</div>
+        <div style="font-size:20px;font-weight:800;color:#4D96FF">76</div>
+      </div>
+      <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:10px 4px">
+        <div style="font-size:11px;opacity:.6">生活</div>
+        <div style="font-size:20px;font-weight:800;color:#B39DDB">82</div>
+      </div>
+    </div>
+    <div style="background:rgba(255,217,61,.12);border-left:3px solid #FFD93D;border-radius:8px;padding:12px 14px;font-size:13.5px;line-height:1.7;margin-bottom:12px">
+
+      🎉 <strong>今日十二星座好运榜第3名！</strong>综合运势比昨天上涨10分。今天的天蝎座身体仿佛被注入一股清新活力，整个人透着轻盈与舒展——哪怕只是几次深呼吸、简单伸个懒腰，都能体会到由内而外的通透感。
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+      <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:#FF9FB2;margin-bottom:6px">💕 爱情运 · 99分</div>
+        桃花运旺盛！恋爱中用心相处总有进展，真诚表达自己即可。单身者宜多外出社交，但需辨明真缘分，莫被烂桃花所困。今日与狮子座最来电。
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:#7ED98A;margin-bottom:6px">💼 事业运 · 83分</div>
+        情绪稳定，愉悦少烦忧。做事之前别预期太高，一分耕耘一分收获，相信自己别犹豫彷徨，制定计划考虑实际情况为宜。
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:#7FB3FF;margin-bottom:6px">💰 财运 · 76分</div>
+        日常做项目获得些收益问题不大，多少有一些不算白干。但财运遇竞争需谨慎应对，宜理性消费、持家节流，莫存侥幸心理。
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:12px">
+        <div style="font-weight:700;color:#C5A3E8;margin-bottom:6px">🌿 健康提醒</div>
+        状态还行，注意少大吃大喝，要有保养身体的意识。难得的轻盈日，顺应这份舒展，做点让自己放松的事。
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:12px">
+      <span style="background:rgba(255,255,255,.1);padding:5px 12px;border-radius:14px">🔢 幸运数字：3</span>
+      <span style="background:rgba(255,255,255,.1);padding:5px 12px;border-radius:14px">🧭 幸运方位：东</span>
+      <span style="background:rgba(255,255,255,.1);padding:5px 12px;border-radius:14px">🎨 幸运色：深湖蓝·橙·水草绿</span>
+      <span style="background:rgba(255,255,255,.1);padding:5px 12px;border-radius:14px">⏰ 吉时：10:00-11:00</span>
+      <span style="background:rgba(255,255,255,.1);padding:5px 12px;border-radius:14px">🦁 福星：狮子座</span>
+    </div>
+  </div>
+
+  <!-- ═══ 正向信念（重点突出） ═══ -->
+  <div class="card" style="background:linear-gradient(135deg,#FFF7E6,#FFEED6);border:2px solid #FFD93D;padding:24px">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:32px;margin-bottom:6px">✨</div>
+      <div style="font-size:20px;font-weight:800;color:#8B5A00">正向信念 · 每日默念</div>
+      <div style="font-size:12.5px;color:#B8860B;margin-top:4px">大声读出来，让信念刻进潜意识</div>
+    </div>
+    <div style="display:grid;gap:10px">
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #FFD93D">💎 我值得拥有更好的生活，我正在为之努力</div>
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #FF9500">🚀 每天进步1%，一年就是37倍的自己</div>
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #FF6B35">💰 财富是认知的变现，我每天都在提升认知</div>
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #6BCB77">🔥 困难是成长的阶梯，我迎难而上</div>
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #4D96FF">🎯 专注创造价值，价值带来回报</div>
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #9B59B6">💪 我的努力正在悄悄改变命运</div>
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #FF6B9D">🌻 今天比昨天更好，明天比今天更好</div>
+      <div style="background:#FFF;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600;color:#5D4E37;box-shadow:0 2px 8px rgba(255,193,61,.15);border-left:4px solid #00BCD4">🌟 我是一切的根源，我选择积极面对</div>
+    </div>
+  </div>
+
+  <!-- ═══ 正能量图片墙（CSS艺术卡片） ═══ -->
+  <div class="section-label">🖼️ 今日正能量画面</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+    <div style="border-radius:14px;overflow:hidden;box-shadow:var(--shadow2);position:relative;aspect-ratio:4/3;background:linear-gradient(160deg,#FFB84D 0%,#FF8C42 45%,#E8652D 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px">
+      <div style="position:absolute;top:14px;left:14px;font-size:34px">🌅</div>
+      <div style="position:absolute;top:10px;right:12px;font-size:22px;opacity:.7">☀️</div>
+      <div style="color:#FFF;font-weight:700;font-size:14px;text-shadow:0 1px 4px rgba(0,0,0,.25)">日出东方</div>
+      <div style="color:rgba(255,255,255,.85);font-size:11px">每一天都是全新的开始</div>
+    </div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:var(--shadow2);position:relative;aspect-ratio:4/3;background:linear-gradient(160deg,#4D96FF 0%,#6BA8FF 50%,#9CC3FF 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px">
+      <div style="position:absolute;top:14px;left:14px;font-size:34px">🌊</div>
+      <div style="position:absolute;top:12px;right:14px;font-size:20px;opacity:.7">⛵</div>
+      <div style="color:#FFF;font-weight:700;font-size:14px;text-shadow:0 1px 4px rgba(0,0,0,.25)">乘风破浪</div>
+      <div style="color:rgba(255,255,255,.85);font-size:11px">直挂云帆济沧海</div>
+    </div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:var(--shadow2);position:relative;aspect-ratio:4/3;background:linear-gradient(160deg,#6BCB77 0%,#8FD694 50%,#B8E6B8 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px">
+      <div style="position:absolute;top:14px;left:14px;font-size:34px">🌻</div>
+      <div style="position:absolute;top:16px;right:16px;font-size:18px;opacity:.7">🦋</div>
+      <div style="color:#FFF;font-weight:700;font-size:14px;text-shadow:0 1px 4px rgba(0,0,0,.25)">向阳而生</div>
+      <div style="color:rgba(255,255,255,.85);font-size:11px">心中有光，何惧路长</div>
+    </div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:var(--shadow2);position:relative;aspect-ratio:4/3;background:linear-gradient(160deg,#9B59B6 0%,#B377C9 50%,#D1A3E4 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px">
+      <div style="position:absolute;top:14px;left:14px;font-size:34px">🏔️</div>
+      <div style="position:absolute;top:12px;right:14px;font-size:20px;opacity:.7">🧗</div>
+      <div style="color:#FFF;font-weight:700;font-size:14px;text-shadow:0 1px 4px rgba(0,0,0,.25)">勇攀高峰</div>
+      <div style="color:rgba(255,255,255,.85);font-size:11px">山顶的风景值得所有汗水</div>
+    </div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:var(--shadow2);position:relative;aspect-ratio:4/3;background:linear-gradient(160deg,#FF6B9D 0%,#FF8FB1 50%,#FFB3C6 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px">
+      <div style="position:absolute;top:14px;left:14px;font-size:34px">🌸</div>
+      <div style="position:absolute;top:14px;right:14px;font-size:18px;opacity:.7">💮</div>
+      <div style="color:#FFF;font-weight:700;font-size:14px;text-shadow:0 1px 4px rgba(0,0,0,.25)">静待花开</div>
+      <div style="color:rgba(255,255,255,.85);font-size:11px">你只管努力，时间会给你答案</div>
+    </div>
+    <div style="border-radius:14px;overflow:hidden;box-shadow:var(--shadow2);position:relative;aspect-ratio:4/3;background:linear-gradient(160deg,#F7B733 0%,#FC4A1A 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:14px">
+      <div style="position:absolute;top:14px;left:14px;font-size:34px">💰</div>
+      <div style="position:absolute;top:12px;right:14px;font-size:20px;opacity:.7">📈</div>
+      <div style="color:#FFF;font-weight:700;font-size:14px;text-shadow:0 1px 4px rgba(0,0,0,.25)">日富一日</div>
+      <div style="color:rgba(255,255,255,.85);font-size:11px">努力赚钱，认真生活</div>
+    </div>
+  </div>
+
+  <!-- ═══ 正能量视频推荐 ═══ -->
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">🎬 今日正能量视频</div>
+      <span class="card-badge orange">充电5分钟</span>
+    </div>
+    <ul class="news-list">
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge bili">B站</span>
+          <a class="vid-link" href="https://search.bilibili.com/all?keyword=%E5%8A%B1%E5%BF%97%20%E6%B7%B7%E5%89%AA%20%E7%87%83" target="_blank">▶ 去观看</a>
+        </div>
+        <div class="news-title"><a href="https://search.bilibili.com/all?keyword=%E5%8A%B1%E5%BF%97%20%E6%B7%B7%E5%89%AA%20%E7%87%83" target="_blank">B站励志混剪：那些杀不死你的，终将使你更强大</a></div>
+        <div class="news-desc">高燃影视混剪+热血BGM，3分钟把状态拉满。适合早上起床或午休后观看。</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge douyin">抖音</span>
+          <a class="vid-link" href="https://www.douyin.com/search/%E6%AF%8F%E6%97%A5%E6%AD%A3%E8%83%BD%E9%87%8F" target="_blank">▶ 去观看</a>
+        </div>
+        <div class="news-title"><a href="https://www.douyin.com/search/%E6%AF%8F%E6%97%A5%E6%AD%A3%E8%83%BD%E9%87%8F" target="_blank">抖音每日正能量：普通人的高光时刻合集</a></div>
+        <div class="news-desc">普通人努力生活的真实瞬间，最治愈人心的烟火气。</div>
+      </li>
+      <li class="news-item">
+        <div class="news-src">
+          <span class="plat-badge bili">B站</span>
+          <a class="vid-link" href="https://search.bilibili.com/all?keyword=%E5%8A%B1%E5%BF%97%E6%BC%94%E8%AE%B2%20%E4%B8%AD%E6%96%87" target="_blank">▶ 去观看</a>
+        </div>
+        <div class="news-title"><a href="https://search.bilibili.com/all?keyword=%E5%8A%B1%E5%BF%97%E6%BC%94%E8%AE%B2%20%E4%B8%AD%E6%96%87" target="_blank">经典励志演讲：你为什么要努力赚钱</a></div>
+        <div class="news-desc">关于赚钱、成长与自我实现的深度演讲，搞钱动力充电专用。</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 3 Energy Cards -->
+  <div class="section-label">💪 今日能量补给</div>
+  <div class="energy-grid">
+    <div class="energy-card">
+      <div class="e-icon">💰</div>
+      <div class="e-title">搞钱心态</div>
+      <div class="e-desc">赚钱是成年人最好的修行。<br>你花的每一分钟在工作上，都是在为自己的未来投票。<br><strong>今天也要全力以赴！</strong></div>
+    </div>
+    <div class="energy-card">
+      <div class="e-icon">🎯</div>
+      <div class="e-title">专注当下</div>
+      <div class="e-desc">不要焦虑2小时和8公里以外的事情。<br>做好手头这件事，<br><strong>剩下的交给时间。</strong></div>
+    </div>
+    <div class="energy-card">
+      <div class="e-icon">🔥</div>
+      <div class="e-title">正向循环</div>
+      <div class="e-desc">积极的人像太阳，照到哪里哪里亮。<br>你的能量会感染身边的人，<br><strong>先点亮自己，再照亮他人。</strong></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- Mobile Bottom Nav -->
+<nav class="mob-nav" id="mobNav">
+  <div class="mob-nav-inner">
+    <div class="mob-nav-item active" data-page="energy" onclick="navTo('energy')">
+      <span class="mob-ico">⚡</span> 能量
+    </div>
+    <div class="mob-nav-item" data-page="work" onclick="navTo('work')">
+      <span class="mob-ico">📊</span> 比亚迪
+    </div>
+    <div class="mob-nav-item" data-page="finance" onclick="navTo('finance')">
+      <span class="mob-ico">💹</span> 财经
+    </div>
+    <div class="mob-nav-item" data-page="ai" onclick="navTo('ai')">
+      <span class="mob-ico">🤖</span> AI
+    </div>
+    <div class="mob-nav-item" data-page="canto" onclick="navTo('canto')">
+      <span class="mob-ico">🗣️</span> 粤语
+    </div>
+    <div class="mob-nav-item" data-page="english" onclick="navTo('english')">
+      <span class="mob-ico">🌍</span> 英语
+    </div>
+    <div class="mob-nav-item" data-page="reading" onclick="navTo('reading')">
+      <span class="mob-ico">📚</span> 阅读
+    </div>
+  </div>
+</nav>
+
+<script>
+// ══════ Navigation ══════
+function navTo(page) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+  document.querySelectorAll('.mob-nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.mob-nav-item[data-page="${page}"]`)?.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  closeSidebar();
+  document.getElementById('mainContent').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+// ══════ Work sub-tabs ══════
+function switchWorkTab(tab, btn) {
+  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.work-sub').forEach(el => el.style.display = 'none');
+  document.getElementById('work-' + tab).style.display = 'block';
+}
+
+// ══════ Sidebar toggle ══════
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ══════ Energy: complete action ══════
+function completeAction(el) {
+  if(el.classList.contains('done')){
+    el.classList.remove('done');
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.opacity = '';
+  } else {
+    el.classList.add('done');
+    el.style.background = '#E8F5E9';
+    el.style.borderColor = '#4CAF50';
+    el.style.opacity = '0.7';
+  }
+}
+
+function toggleReadCheckIn() {
+  const btn = document.getElementById('readCheckInBtn');
+  const streak = document.getElementById('readStreak');
+  if(btn.innerText.includes('已阅读')){
+    btn.innerText = '📖 点击完成今日阅读';
+    btn.style.background = 'var(--dark3)';
+    streak.innerText = '🔥 连续打卡 11 天';
+  } else {
+    btn.innerText = '✅ 今日已阅读30min';
+    btn.style.background = 'var(--sun-grad)';
+    streak.innerText = '🔥 连续打卡 12 天';
+  }
+}
+
+function toggleSunflower() {
+  const btn = document.getElementById('sunflowerBtn');
+  const streak = document.getElementById('sunflowerStreak');
+  if(btn.innerText.includes('已完成')){
+    btn.innerText = '🌻 点击完成今日打卡';
+    btn.style.background = 'var(--dark3)';
+    streak.innerText = '🔥 连续打卡 7 天';
+  } else {
+    btn.innerText = '✅ 今日已完成';
+    btn.style.background = 'var(--sun-grad)';
+    streak.innerText = '🔥 连续打卡 8 天';
+  }
+}
+
+
+// ══════ Cantonese TTS 发音系统 ══════
+let cantoVoiceCache = [];
+function loadCantoVoices() {
+  if ('speechSynthesis' in window) cantoVoiceCache = speechSynthesis.getVoices();
+}
+if ('speechSynthesis' in window) {
+  loadCantoVoices();
+  speechSynthesis.onvoiceschanged = loadCantoVoices;
+}
+function speakCantonese(text, btn) {
+  if (!('speechSynthesis' in window)) {
+    alert('当前浏览器不支持语音播放，请使用 Safari 或 Chrome 打开');
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const voices = cantoVoiceCache.length ? cantoVoiceCache : speechSynthesis.getVoices();
+  // 优先级：粤语(zh-HK) > 繁中(zh-TW) > 普通话(zh-CN)
+  const hk = voices.find(v => v.lang && v.lang.replace('_','-').toLowerCase() === 'zh-hk')
+    || voices.find(v => v.name && /sinji|cantonese|粤语|粵語/i.test(v.name));
+  const tw = voices.find(v => v.lang && v.lang.replace('_','-').toLowerCase().startsWith('zh-tw'));
+  const cn = voices.find(v => v.lang && v.lang.replace('_','-').toLowerCase().startsWith('zh-cn'));
+  const pick = hk || tw || cn;
+  if (pick) { utter.voice = pick; utter.lang = pick.lang; } else { utter.lang = 'zh-HK'; }
+  utter.rate = 0.7;
+  utter.pitch = 1.0;
+  // 播放反馈
+  if (btn) {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '🔈';
+    btn.style.opacity = '1';
+    utter.onend = utter.onerror = () => { btn.innerHTML = orig; btn.style.opacity = ''; };
+  }
+  speechSynthesis.speak(utter);
+  // iOS 首次提示
+  if (!hk && !window._cantoTipShown) {
+    window._cantoTipShown = true;
+    setTimeout(() => {
+      const tip = document.createElement('div');
+      tip.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111827;color:#FFF;padding:12px 18px;border-radius:12px;font-size:12.5px;z-index:999;max-width:85%;box-shadow:0 8px 24px rgba(0,0,0,.3)';
+      tip.innerHTML = '💡 想听标准粤语发音？iPhone可到「设置→辅助功能→朗读内容→声音→中文(粤语)」下载粤语语音包';
+      document.body.appendChild(tip);
+      setTimeout(() => tip.remove(), 5000);
+    }, 600);
+  }
+}
+
+// ══════ 粤拼查询表过滤 ══════
+function filterJyutping() {
+  const q = document.getElementById('jyutSearch').value.trim().toLowerCase();
+  const rows = document.querySelectorAll('#jyutBody tr');
+  let visible = 0;
+  rows.forEach(r => {
+    const text = r.innerText.toLowerCase();
+    const match = !q || text.includes(q);
+    r.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('jyutNoResult').style.display = visible === 0 ? 'block' : 'none';
+}
+
+// ══════ Energy: random quote ══════
+const quotes = [
+  {q:"你今天受的苦，吃的亏，担的责，扛的罪，忍的痛，到最后都会变成光，照亮你的路。",a:"泰戈尔"},
+  {q:"种一棵树最好的时间是十年前，其次是现在。",a:"非洲谚语"},
+  {q:"你只管努力，剩下的交给时间。时间从不辜负认真生活的人。",a:"佚名"},
+  {q:"成功不是将来才有的，而是从决定去做的那一刻起，持续累积而成。",a:"俞敏洪"},
+  {q:"世界上最快乐的事，莫过于为理想而奋斗。",a:"苏格拉底"},
+  {q:"你所做的事情，也许暂时看不到成果，但不要灰心，你不是没有成长，而是在扎根。",a:"佚名"},
+  {q:"乾坤未定，你我皆是黑马。乾坤已定，那就扭转乾坤。",a:"佚名"},
+  {q:"赚钱是最好的修行。不是因为它能买来物质，而是它证明你为这个世界创造了价值。",a:"纳瓦尔"},
+];
+function randomQuote(){
+  const i = Math.floor(Math.random() * quotes.length);
+  document.getElementById('energyQuote').textContent = '\u201C' + quotes[i].q + '\u201D';
+  document.querySelector('.energy-author').textContent = '\u2014\u2014 ' + quotes[i].a;
+}
+// Random quote on page load
+randomQuote();
+
+// ══════ Clock ══════
+function updateClock() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'});
+  const d = now.toLocaleDateString('zh-CN', {month:'long',day:'numeric',weekday:'short'});
+  document.getElementById('sidebarTime').textContent = d + ' ' + t;
+}
+updateClock(); setInterval(updateClock, 60000);
+
+// ══════ Close overlay ══════
+document.getElementById('overlay').addEventListener('click', closeSidebar);
+
+// ══════ Handle resize ══════
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) closeSidebar();
+});
+</script>
+</body>
+</html>
